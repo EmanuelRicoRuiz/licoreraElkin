@@ -115,7 +115,7 @@ function facturaPdf(element) {
                                         if (data.length == j + 1) {
                                             doc.setFontSize(12);
 
-                                            doc.text(40, yp + 20, `Subtotal: ${ingresar(sumaTotal)}\nDescuentos: ${ingresar(sumaDescuentos)}\nTotal: ${ingresar(datos.suma)}`)
+                                            doc.text(30, yp + 20, `Subtotal: ${ingresar(sumaTotal)}\nDescuentos: ${ingresar(sumaDescuentos)}\nTotal: ${ingresar(datos.suma)}`)
 
                                         }
                                     }
