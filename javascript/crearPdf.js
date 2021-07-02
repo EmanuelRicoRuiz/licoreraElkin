@@ -70,7 +70,7 @@ function facturaPdf(element) {
                                             doc.text(xc, yc, columns[h].toString())
 
                                             if (h == 1) {
-                                                xc += 35
+                                                xc += 30
                                             } else {
                                                 xc += 22
                                             }
@@ -94,8 +94,8 @@ function facturaPdf(element) {
                                             aux2 = aux[k];
                                             aux2 = aux2.toString();
                                             var aux3 = "";
-                                            if (aux2.length > 20) {
-                                                for (let p = 0; p < 20; p++) {
+                                            if (aux2.length > 18) {
+                                                for (let p = 0; p < 18; p++) {
                                                     aux3 += aux2[p]
                                                 }
                                             } else {
@@ -104,7 +104,7 @@ function facturaPdf(element) {
 
                                             doc.text(xp, yp, aux3)
                                             if (k == 1) {
-                                                xp += 35
+                                                xp += 30
                                             } else {
                                                 xp += 22
                                             }
