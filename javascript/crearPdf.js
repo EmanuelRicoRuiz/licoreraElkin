@@ -31,7 +31,7 @@ function facturaPdf(element) {
                 console.log("entró")
 
                 function cabecera() {
-                    doc.addImage(img, 'JPEG', 20, y, 40, 20);
+                    doc.addImage(img, 'jpg', 20, y, 40, 20);
                     var hoy=new Date();
                     hora=`Hora: `+hoy.getHours() + ':' + hoy.getMinutes() + ':' + hoy.getSeconds();
                     dia=`Fecha: `+hoy.getDate() + '/' + ( hoy.getMonth() + 1 ) + '/' + hoy.getFullYear();
