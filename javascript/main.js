@@ -329,7 +329,7 @@ function tabTwoVentasG(mes, año) {
                 querySnapshot.forEach((doc2) => {
                     var datos2 = doc2.data();
                     
-                        if (mes == datos.fecha[1] && año == datos.fecha[2]) {
+                        
                             entrada = true;
                             var avis = document.getElementById("aviso1");
                             avis.innerHTML = "";
@@ -349,7 +349,7 @@ function tabTwoVentasG(mes, año) {
                                         <td>${(datos.rentabilidad / 100 * datos.cantidad_abono).toFixed(2)}</td>
                                     </tr>
                                     `
-                        }
+                        
                         var recaudo1 = document.getElementById("ValorRecaudo");
                         recaudo1.innerHTML = `
                         <center>
