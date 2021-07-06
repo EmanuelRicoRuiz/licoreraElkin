@@ -209,7 +209,7 @@ function tabTreeVentasG(mes, año) {
 
             if (fechaActual >= fechaVencimiento && datos.entregado && mes == datos.fecha[1] && año == datos.fecha[2]) {
 
-
+                console.log(doc.id);
                 tabTree.innerHTML += `<div class="overflow-auto"><table  class="table table-striped table-bordered" id="Cabecera2${doc.id}">
                 <tr>
                     <th>Número de factura</th>

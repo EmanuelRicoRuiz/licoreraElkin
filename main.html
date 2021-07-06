@@ -51,9 +51,9 @@
                 <a class="list-group-item list-group-item-action bg-light" onclick="listaDeUsuarios()" href="#">Lista de
                     usuarios</a>
                 <a class="list-group-item list-group-item-action bg-light" onclick="ventasGenerales()" href="#">Ventas
-                    </a>
+                </a>
                 <a class="list-group-item list-group-item-action bg-light" onclick="pedidosGenerales()" href="#">Pedidos
-                    </a>
+                </a>
                 <a class="list-group-item list-group-item-action bg-light" onclick="cargarClientes()"
                     href="#">Clientes</a>
                 <a class="list-group-item list-group-item-action bg-light" onclick="RealizarDevoluciones()"
@@ -79,9 +79,9 @@
                     aria-label="Toggle navigation"><span class="navbar-toggler-icon"></span></button>
                 <div class="collapse navbar-collapse" id="navbarSupportedContent">
                     <ul class="navbar-nav ml-auto mt-2 mt-lg-0">
-                        
+
                         <li class="nav-item"><a onclick="cerrarS()" class="nav-link" href="#!">Cerrar Sesión</a></li>
-                        
+
                     </ul>
                 </div>
             </nav>
@@ -89,7 +89,9 @@
                 <div class="container-fluid">
 
                     <div id="main">
-
+                       <!-- <button onclick="actualizar()">actualizar</button>
+                        <button onclick="mudar()">muda</button>
+                        -->
                     </div>
 
 
@@ -109,6 +111,83 @@
     <!-- Core theme JS-->
     <script src="javascript/scripts.js"></script>
     <script src="javascript/menu.js"></script>
+    <script>
+        function actualizar() {
+
+            db.collection("ventas").get().then((querySnapshot) => {
+                querySnapshot.forEach(doc => {
+                    var datos = doc.data();
+                    cantidades = datos.cantidades;
+                    idProducto = datos.idProducto;
+                    descuentos = datos.descuentos;
+                    entregado = datos.entregado;
+                    vendedor = datos.vendedor;
+                    fecha = datos.fecha;
+                    pagado = datos.pagado
+                    suma = datos.suma;
+                    debe = datos.debe
+                    cliente = datos.cliente
+                    NumeroFactura = datos.NumeroFactura;
+                    rentabilidad = datos.rentabilidad;
+                    plazo = datos.plazo;
+                    fechaVencimiento = datos.fechaVencimiento;
+                    db.collection("aux").doc(doc.id).set({
+                        cantidades,
+                        idProducto,
+                        descuentos,
+                        entregado,
+                        vendedor,
+                        fecha,
+                        pagado,
+                        suma,
+                        debe,
+                        cliente,
+                        NumeroFactura,
+                        rentabilidad,
+                        plazo,
+                        fechaVencimiento
+                    })
+
+
+                });
+
+            })
+        }
+        var iter=0;
+        const obtener=(id)=>db.collection("productos").doc(id).get();
+        async function mudar() {
+            db.collection("aux").get().then((querySnapshot) => {
+                querySnapshot.forEach( async doc => {
+                    var datos = doc.data();
+                    NumeroFactura = datos.NumeroFactura;
+                    if (NumeroFactura <= 193) {
+                        iter+=1
+                        cantidades = datos.cantidades;
+                        idProducto = datos.idProducto;
+                        descuentos = datos.descuentos;
+                        entregado = datos.entregado;
+                        vendedor = datos.vendedor;
+                        fecha = datos.fecha;
+                        pagado = datos.pagado
+                        suma = datos.suma;
+                        debe = datos.debe
+                        cliente = datos.cliente
+                        rentabilidad = datos.rentabilidad;
+                        plazo = datos.plazo;
+                        fechaVencimiento = datos.fechaVencimiento;
+                        valor=[];
+                        for (let i=0;i<idProducto.length;i++){
+                            producto=await obtener(idProducto[i]);
+                            console.log(producto.data());
+                        }
+                       
+                    }
+
+                })
+            })
+        }
+
+    </script>
 </body>
 
 </html>

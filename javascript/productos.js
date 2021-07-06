@@ -136,9 +136,9 @@ async function cargarProductosLista() {
     tabTree.innerHTML = "";
     tabTree.innerHTML = `
     <br><br><hr>
-    <input class="form-control" type="text" id="buscador" placeholder="Nombre o código del producto">
+    <input class="form-control" onKeyup="filter1(event)" type="text" id="buscador" placeholder="Nombre o código del producto">
     <br>
-    <button class="btn btn-info" onclick="filterProductos()">Buscar</button>
+    
     <br><h3>Lista de productos:<div id="ValorInventario"></div></h3><br><div class="delimitado"><table class="table table-striped table-bordered">
      <thead>
        <tr>
@@ -171,6 +171,11 @@ async function cargarProductosLista() {
 
 
 
+}
+function filter1(event){
+    if(event.keyCode=="13"){
+        filterProductos(); 
+    }
 }
 function filterProductos() {
     var tabla3 = document.getElementById("tabla3");
