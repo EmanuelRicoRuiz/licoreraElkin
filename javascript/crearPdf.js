@@ -18,17 +18,17 @@ function facturaPdf(element) {
         var doc = new jsPDF('p', 'mm', [1000, 80]);;
         var x = 5;
         var y = 10;
-        console.log("entró")
+        
         var entrada = false;
         var logo1 = new Image();
         logo1.src = `KorchosLogo.jpg`;
         doc.setFontSize(7);
-        console.log("entró")
+       
         
         db.collection("clientes").where("nit", "==", datos.cliente).get().then((querySnapshot) => {
             querySnapshot.forEach((doc2) => {
                 var datos2 = doc2.data();
-                console.log("entró")
+                
 
                 function cabecera() {
                     doc.addImage(logo1, 'jpg', 20, y, 40, 20);
@@ -55,7 +55,7 @@ function facturaPdf(element) {
                                 cont += 1;
                                 datos4 = doc4.data();
 
-                                console.log();
+                               
                                 data.push([ingresar(cantidades[i]), datos4.DESCRIPCION, ingresar(descuentos[i])]);
                                 sumaTotal += cantidades[i] * datos4.PRECIO_VENTA;
                                 
@@ -89,7 +89,7 @@ function facturaPdf(element) {
                                         aux = data[j]
                                         xp = 5
                                         yp += 5
-                                        console.log(aux)
+                                       
                                         for (let k = 0; k < aux.length; k++) {
                                             aux2 = aux[k];
                                             aux2 = aux2.toString();
