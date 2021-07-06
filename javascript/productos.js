@@ -750,12 +750,16 @@ function GuardarPedido() {
                         var debe = suma;
                         var rentabilidad = suma - sumaCosto;
                         rentabilidad = rentabilidad * 100 / suma;
-                        var NumeroFactura = 1;
+                        var NumeroFactura = 0;
                         db.collection("consecutivo").get().then((querySnapshot) => {
                             querySnapshot.forEach((doc2) => {
                                 var datos2=doc2.data();
-                                NumeroFactura += datos2.numero;
-
+                                var numero=datos2.numero;
+                                NumeroFactura=numero+1;
+                                numero=NumeroFactura;
+                                db.collection("consecutivo").doc(doc2.id).set({
+                                    numero
+                                })
                             })
                             var plazo;
                             db.collection("clientes").where("nit", "==", cliente).get().then((querySnapshot) => {

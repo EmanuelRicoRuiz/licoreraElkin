@@ -670,7 +670,7 @@ async function pedidosGenerales() {
     </div>
 </div>
   `;
-    /*
+    
         var listaProductos = document.getElementById("productos")
         db.collection("productos").get().then((querySnapshot) => {
             querySnapshot.forEach((doc) => {
@@ -680,7 +680,7 @@ async function pedidosGenerales() {
                 option.text = `Nombre: ${datos.DESCRIPCION}\n Cantidad: ${datos.STOCK}`;
                 listaProductos.appendChild(option);
             });
-        })*/
+        })
     var clientes = document.getElementById("clientes")
     var user = firebase.auth().currentUser;
     user = user.uid
