@@ -480,14 +480,14 @@ var ventaGarray = [];
 function Emitir() {
     var cantidad = document.getElementById("cantidadVenta").value;
     var idProducto = document.getElementById("productos1").value;
-    var Descuento = document.getElementById("Descuento").value;
+    var valorProducto = document.getElementById("valor").value;
     if (cantidad != "") {
         if (idProducto != "") {
-            if (Descuento != "") {
+            if (valorProducto != "") {
                 cantidad = parseInt(cantidad, 10);
-                Descuento = parseFloat(Descuento, 10);
+                valorProducto = parseFloat(valorProducto, 10);
                 var ventaG = {
-                    cantidad, idProducto, Descuento
+                    cantidad, idProducto, valorProducto
                 }
                 ventaGarray.push(ventaG);
 
@@ -495,8 +495,8 @@ function Emitir() {
             } else {
                 Swal.fire({
                     icon: 'error',
-                    title: 'Especificar descuento',
-                    text: 'Si el producto no tiene descuento, debe colocar 0',
+                    title: 'Debe presionar la tecla intro o enter',
+
 
                 })
 
@@ -521,39 +521,44 @@ function Emitir() {
 
 
 }
-function pintarTabla(ventaGarray) {
+const obtenerProductoIN = (id) => db.collection("productos").where("CODIGO", "==", id).get();
+async function pintarTabla(ventaGarray) {
 
     var items = document.getElementById("tabla4");
     items.innerHTML = "";
+    suma = 0;
     for (let i = 0; i < ventaGarray.length; i++) {
-        db.collection("productos").where("CODIGO", "==", ventaGarray[i].idProducto).get().then((querySnapshot) => {
-            querySnapshot.forEach((doc) => {
-                var datos = doc.data();
-                items.innerHTML += `
+        querySnapshot = await obtenerProductoIN(ventaGarray[i].idProducto);
+
+        querySnapshot.forEach((doc) => {
+            suma += ventaGarray[i].valorProducto * ventaGarray[i].cantidad;
+            var datos = doc.data();
+            items.innerHTML += `
                 <tr>
                     <td>${datos.CODIGO}</td>
                     <td>${datos.DESCRIPCION}</td>
                     <td>${datos.STOCK}</td>
-                    <td>${datos.PRECIO_VENTA}</td>
+                    <td><a id="${datos.CODIGO}" class="cursor" onclick="CambiarValor(this)">${ventaGarray[i].valorProducto}</a></td>
                     <td><a id="${datos.CODIGO}" class="cursor" onclick="CambiarCantidad(this)">${ventaGarray[i].cantidad}</a></td>
-                    <td><a id="${datos.CODIGO}" class="cursor" onclick="CambiarDescuento(this)">${ventaGarray[i].Descuento}%</a></td>
                     <th><a id="${datos.CODIGO}" class="cursor" onclick="EliminarItem(this)"><img src="img/delete.png" width=20></a></th>
-                    
                 </tr>
                 `;
+            var botonGuardar = document.getElementById("botonGuadar");
 
-                var botonGuardar = document.getElementById("botonGuadar");
+            botonGuardar.innerHTML = `<button class="btn btn-success" onclick="GuardarPedido()">Guardar</button>`;
 
-                botonGuardar.innerHTML = `<button class="btn btn-success" onclick="GuardarPedido()">Guardar</button>`;
-
-            })
         })
+
     }
     var cantidad = document.getElementById("cantidadVenta");
     var idProducto = document.getElementById("productos1");
-
-    cantidad.value = "";
+    var valorProducto = document.getElementById("valor");
+    valorProducto.value = "";
+    cantidad.value = "1";
     idProducto.value = "";
+    var ValorVentaT = document.getElementById("ValorVentaT");
+    console.log(suma);
+    ValorVentaT.innerHTML = `${suma}`
 }
 function EliminarItem(element) {
     var idElemento = element.id;
@@ -677,11 +682,11 @@ function CambiarCantidad(element) {
     })
 
 }
-function CambiarDescuento(element) {
-    var descuento;
+function CambiarValor(element) {
+    var valor;
     Swal.fire({
-        title: 'Ingrese el nuevo descuento',
-        input: 'text',
+        title: 'Ingrese el nuevo valor',
+        input: 'number',
         inputAttributes: {
             autocapitalize: 'off'
         },
@@ -692,11 +697,12 @@ function CambiarDescuento(element) {
 
     }).then((result) => {
         if (result.isConfirmed) {
-            descuento = result.value;
-            descuento = parseInt(descuento, 10);
+            valor = result.value;
+            valor = parseInt(valor, 10);
             for (let i = 0; i < ventaGarray.length; i++) {
                 if (element.id == ventaGarray[i].idProducto) {
-                    ventaGarray[i].Descuento = descuento;
+
+                    ventaGarray[i].valorProducto = valor;
                 }
             }
 
@@ -708,142 +714,147 @@ function CambiarDescuento(element) {
 function GuardarPedido() {
     var cliente = document.getElementById("clientes1").value;
     if (cliente != "") {
-
-
         var cantidades = [];
         var idProducto = [];
         var descuentos = [];
         for (let i = 0; i < ventaGarray.length; i++) {
             cantidades[i] = ventaGarray[i].cantidad;
             idProducto[i] = ventaGarray[i].idProducto;
-            descuentos[i] = ventaGarray[i].Descuento;
+            descuentos[i] = ventaGarray[i].valorProducto;
         }
         var entrada = true;
         var suma = 0
         var sumaCosto = 0
-        db.collection("productos").get().then((querySnapshot) => {
-            querySnapshot.forEach((doc) => {
-                datos = doc.data();
-                for (let i = 0; i < idProducto.length; i++) {
-                    if (datos.CODIGO == idProducto[i]) {
-                        if (datos.STOCK < cantidades[i]) {
-                            entrada = false;
-                        } else {
-                            suma = suma + (cantidades[i] * (datos.PRECIO_VENTA - (datos.PRECIO_VENTA * (descuentos[i]) / 100)))
-                            sumaCosto = sumaCosto + (cantidades[i] * datos.PRECIO_COMPRA)
-                        }
+        for (let i = 0; i < idProducto.length; i++) {
+            db.collection("productos").where("CODIGO", "==", idProducto[i]).get().then((querySnapshot) => {
+                querySnapshot.forEach((doc) => {
+                    datos = doc.data();
+
+
+                    if (datos.STOCK < cantidades[i]) {
+                        entrada = false;
+                    } else {
+                        suma = suma + (cantidades[i] * descuentos[i])
+                        sumaCosto = sumaCosto + (cantidades[i] * datos.PRECIO_COMPRA)
                     }
-                }
-            })
-            if (entrada) {
-                firebase.auth().onAuthStateChanged((user) => {
-                    var vendedor = user.uid;
-                    var date = new Date();
-                    var fecha = [date.getDate(), date.getMonth() + 1, date.getFullYear()]
-                    var entregado = false;
-                    var pagado = false;
-                    var debe = suma;
-                    var rentabilidad = suma - sumaCosto;
-                    rentabilidad = rentabilidad * 100 / suma;
-                    var NumeroFactura = 1;
-                    db.collection("ventas").get().then((querySnapshot) => {
-                        querySnapshot.forEach((doc) => {
-                            NumeroFactura += 1;
 
-                        })
-                        var plazo;
-                        db.collection("clientes").where("nit", "==", cliente).get().then((querySnapshot) => {
-                            querySnapshot.forEach((doc) => {
-                                var datos = doc.data();
-                                plazo = datos.plazo;
-                            })
-                            var fechaAux = new Date(fecha[2], fecha[1], fecha[0] + plazo)
-                            var fechaVencimiento = [fechaAux.getDate(), fechaAux.getMonth(), fechaAux.getFullYear()]
-                            var pago=document.getElementById("pago").checked;
-                            if(pago){
-                                debe=0;
-                            }
-                            db.collection("ventas").doc().set({
-                                cantidades,
-                                idProducto,
-                                descuentos,
-                                entregado,
-                                vendedor,
-                                fecha,
-                                pagado,
-                                suma,
-                                debe,
-                                cliente,
-                                NumeroFactura,
-                                rentabilidad,
-                                plazo,
-                                fechaVencimiento
 
+                })
+                if (entrada) {
+                    firebase.auth().onAuthStateChanged((user) => {
+                        var vendedor = user.uid;
+                        var date = new Date();
+                        var fecha = [date.getDate(), date.getMonth() + 1, date.getFullYear()]
+                        var entregado = false;
+                        var pagado = false;
+                        var debe = suma;
+                        var rentabilidad = suma - sumaCosto;
+                        rentabilidad = rentabilidad * 100 / suma;
+                        var NumeroFactura = 1;
+                        db.collection("consecutivo").get().then((querySnapshot) => {
+                            querySnapshot.forEach((doc2) => {
+                                var datos2=doc2.data();
+                                NumeroFactura += datos2.numero;
 
                             })
+                            var plazo;
+                            db.collection("clientes").where("nit", "==", cliente).get().then((querySnapshot) => {
+                                querySnapshot.forEach((doc) => {
+                                    var datos = doc.data();
+                                    plazo = datos.plazo;
+                                })
+                                var fechaAux = new Date(fecha[2], fecha[1], fecha[0] + plazo)
+                                var fechaVencimiento = [fechaAux.getDate(), fechaAux.getMonth(), fechaAux.getFullYear()]
+                                /*var pago = document.getElementById("pago").checked;
+                                if (pago) {
+                                    debe = 0;
+                                }*/
+                                var debe =0;
+                                if(debe<suma){
+                                    console.log(suma-debe);
+                                }
+                                db.collection("ventas").doc().set({
+                                    cantidades,
+                                    idProducto,
+                                    descuentos,
+                                    entregado,
+                                    vendedor,
+                                    fecha,
+                                    pagado,
+                                    suma,
+                                    debe,
+                                    cliente,
+                                    NumeroFactura,
+                                    rentabilidad,
+                                    plazo,
+                                    fechaVencimiento
+
+
+                                })
+                            })
+
                         })
+
+                        for (let i = 0; i < idProducto.length; i++) {
+
+                            db.collection("productos").where("CODIGO", "==", idProducto[i]).get()
+                                .then((querySnapshot) => {
+                                    querySnapshot.forEach((doc) => {
+
+                                        var datos = doc.data();
+                                        var CODIGO = datos.CODIGO;
+                                        var DESCRIPCION = datos.DESCRIPCION;
+                                        var STOCK = datos.STOCK;
+                                        var LIMITE_INFERIOR = datos.LIMITE_INFERIOR;
+                                        var PRECIO_VENTA = datos.PRECIO_VENTA;
+                                        var VOLUMEN_GANANCIA = datos.VOLUMEN_GANANCIA;
+                                        var PRECIO_COMPRA = datos.PRECIO_COMPRA;
+                                        var registradoPor = datos.registradoPor;
+                                        var PORCENTAJE = datos.PORCENTAJE;
+                                        STOCK = STOCK - cantidades[i];
+                                        var CATEGORIA = datos.CATEGORIA;
+                                        var fraccionado = datos.fraccionado;
+                                        var valorTrago = datos.valorTrago;
+                                        var ventasTrago = datos.ventasTrago;
+                                        db.collection("productos").doc(doc.id).set({
+                                            CODIGO,
+                                            DESCRIPCION,
+                                            PRECIO_COMPRA,
+                                            PRECIO_VENTA,
+                                            STOCK,
+                                            CATEGORIA,
+                                            LIMITE_INFERIOR,
+                                            registradoPor,
+                                            VOLUMEN_GANANCIA,
+                                            PORCENTAJE,
+                                            fraccionado,
+                                            valorTrago,
+                                            ventasTrago
+                                        })
+                                    })
+
+                                    ventaGarray.splice(i);
+                                    var botonGuadar = document.getElementById("botonGuadar");
+                                    botonGuadar.innerHTML = "";
+
+                                    pintarTabla(ventaGarray)
+                                })
+
+                        }
+                        Swal.fire('Guardado!', '', 'success');
 
                     })
 
-                    for (let i = 0; i < idProducto.length; i++) {
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Inventario insuficiente',
+                        text: 'Al parecer las cantidades que digitaste, superan la cantidad existente',
 
-                        db.collection("productos").where("CODIGO", "==", idProducto[i]).get()
-                            .then((querySnapshot) => {
-                                querySnapshot.forEach((doc) => {
-
-                                    var datos = doc.data();
-                                    var CODIGO = datos.CODIGO;
-                                    var DESCRIPCION = datos.DESCRIPCION;
-                                    var STOCK = datos.STOCK;
-                                    var LIMITE_INFERIOR = datos.LIMITE_INFERIOR;
-                                    var PRECIO_VENTA = datos.PRECIO_VENTA;
-                                    var VOLUMEN_GANANCIA = datos.VOLUMEN_GANANCIA;
-                                    var PRECIO_COMPRA = datos.PRECIO_COMPRA;
-                                    var registradoPor = datos.registradoPor;
-                                    var PORCENTAJE = datos.PORCENTAJE;
-                                    STOCK = STOCK - cantidades[i];
-                                    var CATEGORIA = datos.CATEGORIA;
-                                    var fraccionado = datos.fraccionado;
-                                    var valorTrago = datos.valorTrago;
-                                    var ventasTrago = datos.ventasTrago;
-                                    db.collection("productos").doc(doc.id).set({
-                                        CODIGO,
-                                        DESCRIPCION,
-                                        PRECIO_COMPRA,
-                                        PRECIO_VENTA,
-                                        STOCK,
-                                        CATEGORIA,
-                                        LIMITE_INFERIOR,
-                                        registradoPor,
-                                        VOLUMEN_GANANCIA,
-                                        PORCENTAJE,
-                                        fraccionado,
-                                        valorTrago,
-                                        ventasTrago
-                                    })
-                                })
-
-                                ventaGarray.splice(i);
-                                var botonGuadar = document.getElementById("botonGuadar");
-                                botonGuadar.innerHTML = "";
-
-                                pintarTabla(ventaGarray)
-                            })
-
-                    }
-                    Swal.fire('Guardado!', '', 'success');
-
-                })
-
-            } else {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Inventario insuficiente',
-                    text: 'Al parecer las cantidades que digitaste, superan la cantidad existente',
-
-                })
-            }
-        })
+                    })
+                }
+            })
+        }
 
     } else {
         Swal.fire({
@@ -873,8 +884,8 @@ function GuardarCambiosProducto() {
     STOCK = parseInt(STOCK, 10);
     LIMITE_INFERIOR = parseInt(LIMITE_INFERIOR, 10)
     ventasTrago = parseInt(ventasTrago, 10);
-    NuevaCantidad=document.getElementById("NuevaCantidad").value;
-    NumeroFactura=document.getElementById("NumeroFactura").value;
+    NuevaCantidad = document.getElementById("NuevaCantidad").value;
+    NumeroFactura = document.getElementById("NumeroFactura").value;
     NuevaCantidad = parseInt(NuevaCantidad, 10);
     entrada = !Number.isNaN(NuevaCantidad)
     entrada2 = false;
@@ -883,7 +894,7 @@ function GuardarCambiosProducto() {
     if (CODIGO != "" && DESCRIPCION != "" && PRECIO_VENTA != NaN && PRECIO_COMPRA != NaN && stockPr != NaN && LIMITE_INFERIOR != NaN && CATEGORIA != "") {
         console.log(NuevaCantidad)
         if (entrada && NumeroFactura != "") {
-            
+
             var productos = [];
             var cantidades = [];
             var costos = [];
@@ -986,7 +997,7 @@ function GuardarCambiosProducto() {
 
                                 var registradoPor = datos.registradoPor;
                                 var PORCENTAJE = (VOLUMEN_GANANCIA / PRECIO_VENTA) * 100
-                                var fraccionado=datos.fraccionado;
+                                var fraccionado = datos.fraccionado;
                                 db.collection("productos").doc(doc1.id).set({
                                     CODIGO,
                                     DESCRIPCION,
@@ -1113,7 +1124,7 @@ function AbonarPedido(element) {
 }
 function cambiarEstado(element) {
     var Ventaid = element.id;
-
+    console.log(Ventaid)
     db.collection("ventas").get().then((querySnapshot) => {
         querySnapshot.forEach((doc) => {
             if (doc.id == Ventaid) {

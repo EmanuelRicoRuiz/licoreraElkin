@@ -192,25 +192,25 @@ function tabTreeVentasG(mes, año) {
     </div>
     </div>
     <hr>
-    <div id="aviso3">No hay facturas vencidas.</div>
+    
     `
     var meses = document.getElementById("meses3");
     var años = document.getElementById("años3");
     meses.value = mes;
     años.value = año;
 
-    db.collection("ventas").get().then((querySnapshot) => {
+    db.collection("ventas").orderBy("NumeroFactura", "desc").where("entregado", "==", true).get().then(querySnapshot=> {
         querySnapshot.forEach((doc) => {
             var datos = doc.data();
 
-            
-                var fechaVencimiento = new Date(datos.fechaVencimiento[2], datos.fechaVencimiento[1] - 1, datos.fechaVencimiento[0])
-                var fechaActual = new Date();
 
-                if (fechaActual >= fechaVencimiento && datos.entregado && mes == datos.fecha[1] && año == datos.fecha[2]) {
+            var fechaVencimiento = new Date(datos.fechaVencimiento[2], datos.fechaVencimiento[1] - 1, datos.fechaVencimiento[0])
+            var fechaActual = new Date();
+
+            if (fechaActual >= fechaVencimiento && datos.entregado && mes == datos.fecha[1] && año == datos.fecha[2]) {
 
 
-                    tabTree.innerHTML += `<div class="overflow-auto"><table  class="table table-striped table-bordered" id="Cabecera2${doc.id}">
+                tabTree.innerHTML += `<div class="overflow-auto"><table  class="table table-striped table-bordered" id="Cabecera2${doc.id}">
                 <tr>
                     <th>Número de factura</th>
                     <th>Cliente</th>
@@ -226,10 +226,10 @@ function tabTreeVentasG(mes, año) {
                 </tr>
             </table></div>`;
 
-                    var tablaPedidos1 = document.getElementById("Cabecera2" + doc.id);
+                var tablaPedidos1 = document.getElementById("Cabecera2" + doc.id);
 
 
-                    tablaPedidos1.innerHTML += `
+                tablaPedidos1.innerHTML += `
                 <tr>
                     <td>${datos.NumeroFactura}</td>
                     <td id="${datos.cliente}1${datos.NumeroFactura}"></td>
@@ -253,19 +253,19 @@ function tabTreeVentasG(mes, año) {
                 </tr>
                 
                     `
-                    db.collection("clientes").where("nit", "==", datos.cliente).get().then((querySnapshot) => {
-                        querySnapshot.forEach((doc2) => {
-                            var datosCliente = document.getElementById(`${datos.cliente}1${datos.NumeroFactura}`);
-                            datos2 = doc2.data();
-                            datosCliente.innerHTML = `${datos2.RazonSocial}`
-                        })
+                db.collection("clientes").where("nit", "==", datos.cliente).get().then((querySnapshot) => {
+                    querySnapshot.forEach((doc2) => {
+                        var datosCliente = document.getElementById(`${datos.cliente}1${datos.NumeroFactura}`);
+                        datos2 = doc2.data();
+                        datosCliente.innerHTML = `${datos2.RazonSocial}`
                     })
-                }
-            })
-
-
+                })
+            }
         })
-    
+
+
+    })
+
 }
 function tabTwoVentasG(mes, año) {
 
@@ -328,18 +328,18 @@ function tabTwoVentasG(mes, año) {
             db.collection("ventas").where("NumeroFactura", "==", datos.NumeroFactura).get().then((querySnapshot) => {
                 querySnapshot.forEach((doc2) => {
                     var datos2 = doc2.data();
-                    
-                        
-                            entrada = true;
-                            var avis = document.getElementById("aviso1");
-                            avis.innerHTML = "";
-                            suma += datos.cantidad_abono;
 
 
-                            var tablaRecaudo = document.getElementById("tablaRecaudo");
+                    entrada = true;
+                    var avis = document.getElementById("aviso1");
+                    avis.innerHTML = "";
+                    suma += datos.cantidad_abono;
 
 
-                            tablaRecaudo.innerHTML += `
+                    var tablaRecaudo = document.getElementById("tablaRecaudo");
+
+
+                    tablaRecaudo.innerHTML += `
                                     <tr>
                                         <td>${datos.NumeroFactura}</td>
                                         <td>${ingresar(datos.cantidad_abono)}</td>
@@ -349,9 +349,9 @@ function tabTwoVentasG(mes, año) {
                                         <td>${(datos.rentabilidad / 100 * datos.cantidad_abono).toFixed(2)}</td>
                                     </tr>
                                     `
-                        
-                        var recaudo1 = document.getElementById("ValorRecaudo");
-                        recaudo1.innerHTML = `
+
+                    var recaudo1 = document.getElementById("ValorRecaudo");
+                    recaudo1.innerHTML = `
                         <center>
                         <div class="col-md-6">
                             <table class="table table-striped table-bordered">
@@ -365,7 +365,7 @@ function tabTwoVentasG(mes, año) {
                             </table>
                         </div>
                         </center>`
-                    
+
 
 
                 })
@@ -410,16 +410,16 @@ function tabOneVentasG(mes, año) {
     <hr>
     `
 
-    db.collection("ventas").get().then((querySnapshot) => {
+    db.collection("ventas").orderBy("NumeroFactura", "desc").get().then(querySnapshot=> {
         querySnapshot.forEach((doc) => {
             var datos = doc.data();
-                var fechaVencimiento = new Date(datos.fechaVencimiento[2], datos.fechaVencimiento[1] - 1, datos.fechaVencimiento[0])
-                var fechaActual = new Date();
+            var fechaVencimiento = new Date(datos.fechaVencimiento[2], datos.fechaVencimiento[1] - 1, datos.fechaVencimiento[0])
+            var fechaActual = new Date();
 
-                if (fechaActual < fechaVencimiento && datos.entregado && mes == datos.fecha[1] && año == datos.fecha[2]) {
+            if (fechaActual < fechaVencimiento && datos.entregado && mes == datos.fecha[1] && año == datos.fecha[2]) {
 
 
-                    tabOne.innerHTML += `<div class="overflow-auto"><table  class="table table-striped table-bordered" id="Cabecera${doc.id}">
+                tabOne.innerHTML += `<div class="overflow-auto"><table  class="table table-striped table-bordered" id="Cabecera${doc.id}">
                 <tr>
                     <th>Número de factura</th>
                     <th>Cliente</th>
@@ -435,10 +435,10 @@ function tabOneVentasG(mes, año) {
                 </tr>
             </table></div>`;
 
-                    var tablaPedidos = document.getElementById("Cabecera" + doc.id);
+                var tablaPedidos = document.getElementById("Cabecera" + doc.id);
 
 
-                    tablaPedidos.innerHTML += `
+                tablaPedidos.innerHTML += `
                 <tr>
                     <td>${datos.NumeroFactura}</td>
                     <td id="${datos.cliente}${datos.NumeroFactura}"></td>
@@ -462,21 +462,21 @@ function tabOneVentasG(mes, año) {
                 </tr>
                 
                     `
-                    db.collection("clientes").where("nit", "==", datos.cliente).get().then((querySnapshot) => {
-                        querySnapshot.forEach((doc2) => {
-                            var datosCliente = document.getElementById(`${datos.cliente}${datos.NumeroFactura}`);
-                            datos2 = doc2.data();
-                            datosCliente.innerHTML = `${datos2.RazonSocial}`
-                        })
+                db.collection("clientes").where("nit", "==", datos.cliente).get().then((querySnapshot) => {
+                    querySnapshot.forEach((doc2) => {
+                        var datosCliente = document.getElementById(`${datos.cliente}${datos.NumeroFactura}`);
+                        datos2 = doc2.data();
+                        datosCliente.innerHTML = `${datos2.RazonSocial}`
                     })
-                }
-            })
-
-
-
-
+                })
+            }
         })
-    
+
+
+
+
+    })
+
 }
 function FiltrarG(element) {
     var id = element.id;
@@ -505,7 +505,7 @@ function FiltrarG(element) {
     }
 }
 function Proveedores() {
-    
+
     var login = document.getElementById("login-page");
     login.innerHTML = "";
     var main = document.getElementById("main");
@@ -545,7 +545,31 @@ function Proveedores() {
     cargarTabs();
     ListarProveedores();
 }
-function pedidosGenerales(){
+function onKeyUp(element, event) {
+    
+        if (event.keyCode == "13" || event.keyCode == "69") {
+            console.log(element.value);
+            db.collection("productos").doc(element.value).get().then(doc => {
+                var datos = doc.data();
+                var valor = document.getElementById("valor");
+                valor.value = datos.PRECIO_VENTA;
+            }).catch((error) => {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Producto inválido',
+                    text: 'El producto no existe',
+        
+                }) 
+            });
+            
+        }
+
+    
+
+}
+const obtenerVentasSinEntregar = () => db.collection("ventas").orderBy("NumeroFactura", "desc").where("entregado", "==", false).get();
+
+async function pedidosGenerales() {
     var main = document.getElementById("main");
     main.innerHTML = ``;
     var login = document.getElementById("login-page");
@@ -563,29 +587,27 @@ function pedidosGenerales(){
 
             <div id="tabOne">
             <br>
-            <center><h2>Montar pedido</h2></center>
+            <center><h2>Montar venta</h2></center>
+            
+            <input onkeyup="onKeyUp(this,event)" list="productos" id="productos1" class="form-control"
+                placeholder="Nombre del producto">
+        
             <center>
                 <table class="table">
                     <tr>
                         <td>
-                            <input list="productos" id="productos1" class="form-control"
-                                placeholder="Nombre del producto">
-                        </td>
-                        <td>
+                            cliente:
                             <input list="clientes" id="clientes1" class="form-control"
                                 placeholder="Nombre del cliente">
                         </td>
                         <td>
-                            <input id="cantidadVenta" class="form-control " placeholder="cantidad">
+                            Cantidad:
+                            <input id="cantidadVenta" class="form-control " placeholder="cantidad" value="1">
                         </td>
                         <td>
-                            <input id="Descuento" class="form-control " placeholder="Descuento">
+                            Valor:
+                            <input id="valor" class="form-control " placeholder="Valor del producto">
                         </td>
-                        <td>
-                            <input type="checkbox" id="pago" class="form-check-input">
-                            <label class="form-check-label"" for="pago">pago contado</label>
-                        </td>
-                        
                     </tr>
                 </table>
                 <datalist class="form-select" id="productos"></datalist>
@@ -604,12 +626,17 @@ function pedidosGenerales(){
                                 <th>stock</th>
                                 <th>precio del producto</th>
                                 <th>Cantidad</th>
-                                <th>Descuento</th>
                                 <th>Acciones</th>
                             </tr>
                         </thead>
                         <tbody id="tabla5"></tbody>
                         <tbody id="tabla4"></tbody>
+                        <tr>
+                            <td  colspan="6" class="text-right">
+                            Subtotal:
+                            <div id="ValorVentaT"></div>
+                            </td>
+                        </tr>
                         <tr>
                             <td colspan=7>
                                 <center>
@@ -617,7 +644,7 @@ function pedidosGenerales(){
                                 </center>
                             </td>
                         </tr>
-                        </tbody>
+                        
         
                     </table>
                 </table>
@@ -643,22 +670,28 @@ function pedidosGenerales(){
     </div>
 </div>
   `;
-    var listaProductos = document.getElementById("productos")
-    db.collection("productos").get().then((querySnapshot) => {
-        querySnapshot.forEach((doc) => {
-            var datos = doc.data();
-            var option = document.createElement("option");
-            option.value = datos.CODIGO;
-            option.text = `Nombre: ${datos.DESCRIPCION}\n Cantidad: ${datos.STOCK}`;
-            listaProductos.appendChild(option);
-        });
-    })
+    /*
+        var listaProductos = document.getElementById("productos")
+        db.collection("productos").get().then((querySnapshot) => {
+            querySnapshot.forEach((doc) => {
+                var datos = doc.data();
+                var option = document.createElement("option");
+                option.value = datos.CODIGO;
+                option.text = `Nombre: ${datos.DESCRIPCION}\n Cantidad: ${datos.STOCK}`;
+                listaProductos.appendChild(option);
+            });
+        })*/
     var clientes = document.getElementById("clientes")
     var user = firebase.auth().currentUser;
     user = user.uid
     db.collection("clientes").get().then((querySnapshot) => {
         querySnapshot.forEach((doc) => {
+
             var datos = doc.data();
+            if (datos.RazonSocial == "generico") {
+                var clientes1 = document.getElementById("clientes1");
+                clientes1.value = doc.id;
+            }
             var option = document.createElement("option");
             option.value = doc.id;
             option.text = `Nombre: ${datos.RazonSocial}`;
@@ -670,17 +703,15 @@ function pedidosGenerales(){
     var tabTwo = document.getElementById("tabTwo");
     var user = firebase.auth().currentUser;
     user = user.uid;
-    db.collection("ventas").get().then((querySnapshot) => {
-        querySnapshot.forEach((doc) => {
-            var datos = doc.data();
-            
-                if (!datos.entregado) {
+    var ventas = await obtenerVentasSinEntregar();
+    var posiciones = [];
 
+    ventas.forEach((doc) => {
 
-                    tabTwo.innerHTML += `<div class="overflow-auto"><table  class="table table-striped table-bordered" id="Cabecera${doc.id}">
+        var datos = doc.data();
+        tabTwo.innerHTML += `<div class="overflow-auto"><table  class="table table-striped table-bordered" id="Cabecera${doc.id}">
                     <tr>
                         <th>Número de factura</th>
-                        <th>Cliente</th>
                         <th>Estado de entrega</th>
                         <th>Estado de pago</th>
                         <th>Valor</th>
@@ -691,14 +722,10 @@ function pedidosGenerales(){
                        
                     </tr>
                 </table></div>`;
-
-                    var tablaPedidos = document.getElementById("Cabecera" + doc.id);
-
-
-                    tablaPedidos.innerHTML += `
+        var tablaPedidos = document.getElementById("Cabecera" + doc.id);
+        tablaPedidos.innerHTML += `
                     <tr>
                         <td>${datos.NumeroFactura}</td>
-                        <td id="${datos.cliente}${datos.NumeroFactura}"></td>
                         <td>${datos.entregado}</td>
                         <td>${datos.pagado}</td>
                         <td>${ingresar(datos.suma)}</td>
@@ -710,7 +737,6 @@ function pedidosGenerales(){
                         <a class="cursor" id="${doc.id}" onclick="cambiarEstado(this)"><img src="img/envio.png" width=30></a>
                         <a class="cursor" id="${doc.id}" onclick="facturaPdf(this)"><img src="img/factura.png" width=30></a>
                         <a class="cursor" id="${doc.id}" onclick="contenidoPedido(this)"><img src="img/contenido.png" width=30></a></td>
-                        
                     </tr>
                     
                     <tr>
@@ -720,22 +746,8 @@ function pedidosGenerales(){
                     </tr>
                     
                         `
-
-                    db.collection("clientes").where("nit", "==", datos.cliente).get().then((querySnapshot) => {
-                        querySnapshot.forEach((doc2) => {
-
-                            var datosCliente = document.getElementById(`${datos.cliente}${datos.NumeroFactura}`);
-                            datos2 = doc2.data();
-                            datosCliente.innerHTML = `${datos2.RazonSocial}`
-                        })
-                    })
-
-
-                }
-            
-
-        })
     })
+
 }
 function ListarProveedores() {
     var tabTwo = document.getElementById("tabTwo");
@@ -885,7 +897,7 @@ function ingresarProductosInterface() {
     </div>
 </div>
 <br><hr><br></center>`;
-    
+
 
 
 }
@@ -951,9 +963,9 @@ async function cargarClientes() {
 
             var tabla8 = document.getElementById("tabla8");
 
-            
 
-            
+
+
             tabla8.innerHTML += `
             <tr>
                 <td>${nit}</td>
@@ -1023,7 +1035,7 @@ async function cargarClientes() {
     </div>
 </div>
 <br><hr><br></center>`;
-    
+
 }
 
 function ventas() {
@@ -1203,7 +1215,7 @@ function contenidoPedido(element) {
                             <th>Código del producto</th>
                             <th>Nombre del producto</th>
                             <th>Cantidad</th>
-                            <th>Descuento</th>
+                            <th>Valor</th>
                         </tr>
                     </table>
                     </td>
@@ -1216,17 +1228,17 @@ function contenidoPedido(element) {
                             <th>${datos.idProducto[i]}</th>
                             <th id="${datos.NumeroFactura}${datos.idProducto[i]}${i}"></th>
                             <th>${datos.cantidades[i]}</th>
-                            <th>${datos.descuentos[i]}%</th>
+                            <th>${datos.descuentos[i]}</th>
                         </tr>
 
                 `;
-                var cont=0;
+                    var cont = 0;
                     db.collection("productos").where("CODIGO", "==", datos.idProducto[i]).get().then((querySnapshot) => {
                         querySnapshot.forEach((doc2) => {
-                            var nombre = document.getElementById(datos.NumeroFactura + datos.idProducto[i]+cont);
+                            var nombre = document.getElementById(datos.NumeroFactura + datos.idProducto[i] + cont);
                             datos2 = doc2.data();
                             nombre.innerHTML = `${datos2.DESCRIPCION}`;
-                            cont+=1;
+                            cont += 1;
                         })
                     })
                 }
@@ -1376,7 +1388,7 @@ function filterProductosGlobal() {
 
 
     })
-    
+
 }
 function cargarListaglobal() {
     var tabla3 = document.getElementById("tabla3");
@@ -1385,37 +1397,37 @@ function cargarListaglobal() {
         validado = true;
         datos = doc.data();
 
-            var aviso = document.getElementById("aviso");
-            aviso.innerHTML = "";
-            fila = document.createElement("tr");
-            Ccodigo = document.createElement("td");
-            Ccodigo.innerHTML = datos.CODIGO
-            Cdescripcion = document.createElement("td");
-            Cdescripcion.innerHTML = datos.DESCRIPCION;
-            CprecioVenta = document.createElement("td");
-            CprecioVenta.innerHTML = ingresar(datos.PRECIO_VENTA);
+        var aviso = document.getElementById("aviso");
+        aviso.innerHTML = "";
+        fila = document.createElement("tr");
+        Ccodigo = document.createElement("td");
+        Ccodigo.innerHTML = datos.CODIGO
+        Cdescripcion = document.createElement("td");
+        Cdescripcion.innerHTML = datos.DESCRIPCION;
+        CprecioVenta = document.createElement("td");
+        CprecioVenta.innerHTML = ingresar(datos.PRECIO_VENTA);
 
-            Cstock = document.createElement("td");
-            Cstock.innerHTML = datos.STOCK;
+        Cstock = document.createElement("td");
+        Cstock.innerHTML = datos.STOCK;
 
 
 
-            Cacciones = document.createElement("td");
-            Cacciones.innerHTML = `<a class="cursor" id="${doc.id}" onclick="observacion(this)"><img src="img/obs.png" width=20 title="Observación"></a><br>
+        Cacciones = document.createElement("td");
+        Cacciones.innerHTML = `<a class="cursor" id="${doc.id}" onclick="observacion(this)"><img src="img/obs.png" width=20 title="Observación"></a><br>
                 <a class="cursor" id="${doc.id}" onclick="mirarObsAdmin(this)"><img src="img/ojo.png" width=20 title="Observaciones"></a><br>
                 `
-            fila.appendChild(Ccodigo);
-            fila.appendChild(Cdescripcion);
-            fila.appendChild(CprecioVenta);
+        fila.appendChild(Ccodigo);
+        fila.appendChild(Cdescripcion);
+        fila.appendChild(CprecioVenta);
 
-            fila.appendChild(Cstock);
+        fila.appendChild(Cstock);
 
 
-            fila.appendChild(Cacciones);
-            tabla3.appendChild(fila);
+        fila.appendChild(Cacciones);
+        tabla3.appendChild(fila);
 
     })
-    
+
 }
 function RealizarDevoluciones() {
     var login = document.getElementById("login-page");
