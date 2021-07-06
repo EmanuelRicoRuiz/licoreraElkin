@@ -20,8 +20,8 @@ function facturaPdf(element) {
         var y = 10;
         console.log("entró")
         var entrada = false;
-        var img = new Image();
-        img.src = `KorchosLogo.jpg`;
+        var logo1 = new Image();
+        logo1.src = `KorchosLogo.jpg`;
         doc.setFontSize(7);
         console.log("entró")
         
@@ -31,7 +31,7 @@ function facturaPdf(element) {
                 console.log("entró")
 
                 function cabecera() {
-                    doc.addImage(img, 'jpg', 20, y, 40, 20);
+                    doc.addImage(logo1, 'jpg', 20, y, 40, 20);
                     var hoy=new Date();
                     hora=`Hora: `+hoy.getHours() + ':' + hoy.getMinutes() + ':' + hoy.getSeconds();
                     dia=`Fecha: `+hoy.getDate() + '/' + ( hoy.getMonth() + 1 ) + '/' + hoy.getFullYear();
@@ -45,20 +45,20 @@ function facturaPdf(element) {
                 var data = [];
                 var cantidades = datos.cantidades;
                 var idProducto = datos.idProducto;
+                var descuentos =datos.descuentos;
                 var cont = 0;
                 var sumaTotal = 0;
                 var sumaDescuentos = 0;
                 for (let i = 0; i < idProducto.length; i++) {
-                    db.collection("productos").get().then((querySnapshot) => {
-                        querySnapshot.forEach((doc4) => {
-                            if (doc4.id == idProducto[i]) {
+                    db.collection("productos").doc(idProducto[i]).get().then((doc4) => {
+                        
                                 cont += 1;
                                 datos4 = doc4.data();
 
                                 console.log();
-                                data.push([ingresar(cantidades[i]), datos4.DESCRIPCION, ingresar(cantidades[i] * datos4.PRECIO_VENTA - (cantidades[i] * datos4.PRECIO_VENTA * (datos.descuentos[i] / 100)))]);
+                                data.push([ingresar(cantidades[i]), datos4.DESCRIPCION, ingresar(descuentos[i])]);
                                 sumaTotal += cantidades[i] * datos4.PRECIO_VENTA;
-                                sumaDescuentos += cantidades[i] * datos4.PRECIO_VENTA * (datos.descuentos[i] / 100)
+                                
                                 xp = 10;
                                 yp = 45;
                                 xc = 5;
@@ -115,7 +115,7 @@ function facturaPdf(element) {
                                         if (data.length == j + 1) {
                                             doc.setFontSize(12);
 
-                                            doc.text(30, yp + 20, `Subtotal: ${ingresar(sumaTotal)}\nDescuentos: ${ingresar(sumaDescuentos)}\nTotal: ${ingresar(datos.suma)}`)
+                                            doc.text(30, yp + 20, `Total: ${ingresar(datos.suma)}`)
 
                                         }
                                     }
@@ -129,8 +129,7 @@ function facturaPdf(element) {
                                         timer: 1500
                                     })
                                 }
-                            }
-                        })
+                            
 
 
                     })

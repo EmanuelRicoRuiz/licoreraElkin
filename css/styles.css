@@ -3918,7 +3918,7 @@ input[type=button].btn-block {
 }
 .nav-tabs .nav-link.active,
 .nav-tabs .nav-item.show .nav-link {
-  color: #495057;
+  color: white;
   background-color: #fff;
   border-color: #dee2e6 #dee2e6 #fff;
 }
@@ -6165,7 +6165,8 @@ button.bg-danger:focus {
 }
 
 .bg-light {
-  background-color: #f8f9fa !important;
+  background-color: #6C6C6C !important;
+  color: white;
 }
 
 a.bg-light:hover, a.bg-light:focus,
