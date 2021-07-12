@@ -89,7 +89,7 @@
                 <div class="container-fluid">
 
                     <div id="main">
-                       <!-- <button onclick="actualizar()">actualizar</button>
+                        <!-- <button onclick="actualizar()">actualizar</button>
                         <button onclick="mudar()">muda</button>
                         -->
                     </div>
@@ -112,7 +112,7 @@
     <script src="javascript/scripts.js"></script>
     <script src="javascript/menu.js"></script>
     <script>
-        function actualizar() {
+        /*function actualizar() {
 
             db.collection("ventas").get().then((querySnapshot) => {
                 querySnapshot.forEach(doc => {
@@ -153,8 +153,28 @@
 
             })
         }
-        var iter=0;
-        const obtener=(id)=>db.collection("productos").doc(id).get();
+        var iter=0;*//*
+        const obtener=()=>db.collection("productos").where("fraccionado","==",true).get();
+        gestionTragos();
+        async function gestionTragos(){
+            var query =await obtener();
+            query.forEach(doc => {
+                var datos=doc.data();
+                console.log(datos.DESCRIPCION,datos.valorTrago,datos.ventasTrago);
+                var DESCRIPCION="TRAGO "+datos.DESCRIPCION;
+                var valorTrago=datos.valorTrago;
+                var ventasTrago=datos.ventasTrago;
+                var CODIGO=datos.CODIGO;
+                var id=doc.id+"T"
+                db.collection("tragos").doc(id).set({
+                    DESCRIPCION,
+                    valorTrago,
+                    ventasTrago,
+                    CODIGO
+                })
+            });
+        }
+        /*
         async function mudar() {
             db.collection("aux").get().then((querySnapshot) => {
                 querySnapshot.forEach( async doc => {
@@ -185,7 +205,83 @@
 
                 })
             })
+        }*/
+/*
+        const obtenerCorreccionVentas = () => db.collection("ventas").orderBy("NumeroFactura", "desc").get();
+        ventas1();
+        async function ventas1() {
+            var cont = 0
+            var query = await obtenerCorreccionVentas();
+            var ventasArray = [];
+            var ids=[]
+            query.forEach(doc => {
+                var datos = doc.data();
+                var num = datos.NumeroFactura;
+                ventasArray.push(num)
+                ids.push(doc.id)
+            });
+            console.log(ventasArray)
+            duplicados=[];
+            duplicadosIds=[];
+            for (let i = 0; i < ventasArray.length; i++) {
+                if (ventasArray[i + 1] === ventasArray[i]) {
+                    duplicados.push(ventasArray[i]);
+                    duplicadosIds.push(ids[i]);
+                }
+                else{
+                    console.log("no repetido")
+                }
+            }
+            
+                console.log(duplicados);
+                console.log(duplicadosIds);
+                /*for(let i=0;i<duplicadosIds.length;i++){
+                    db.collection("ventas").doc(duplicadosIds[i]).delete();
+                }
+
         }
+
+        async function respaldo() {
+            db.collection("aux").get().then((querySnapshot) => {
+                querySnapshot.forEach(doc => {
+                    var datos = doc.data();
+                    cantidades = datos.cantidades;
+                    idProducto = datos.idProducto;
+                    descuentos = datos.descuentos;
+                    entregado = datos.entregado;
+                    vendedor = datos.vendedor;
+                    fecha = datos.fecha;
+                    pagado = datos.pagado
+                    suma = datos.suma;
+                    debe = datos.debe
+                    cliente = datos.cliente
+                    NumeroFactura = datos.NumeroFactura;
+                    rentabilidad = datos.rentabilidad;
+                    plazo = datos.plazo;
+                    fechaVencimiento = datos.fechaVencimiento;
+                    db.collection("ventas").doc(doc.id).set({
+                        cantidades,
+                        idProducto,
+                        descuentos,
+                        entregado,
+                        vendedor,
+                        fecha,
+                        pagado,
+                        suma,
+                        debe,
+                        cliente,
+                        NumeroFactura,
+                        rentabilidad,
+                        plazo,
+                        fechaVencimiento
+                    })
+                    console.log("respaldado");
+
+                });
+
+            })
+        }
+*/
 
     </script>
 </body>

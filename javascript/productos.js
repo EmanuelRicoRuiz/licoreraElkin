@@ -486,6 +486,7 @@ function Emitir() {
     var cantidad = document.getElementById("cantidadVenta").value;
     var idProducto = document.getElementById("productos1").value;
     var valorProducto = document.getElementById("valor").value;
+    
     if (cantidad != "") {
         if (idProducto != "") {
             if (valorProducto != "") {
@@ -495,7 +496,7 @@ function Emitir() {
                     cantidad, idProducto, valorProducto
                 }
                 ventaGarray.push(ventaG);
-
+                console.log(ventaGarray);
                 pintarTabla(ventaGarray);
             } else {
                 Swal.fire({
@@ -527,6 +528,7 @@ function Emitir() {
 
 }
 const obtenerProductoIN = (id) => db.collection("productos").where("CODIGO", "==", id).get();
+const obtenerTrago = (id) => db.collection("tragos").doc(id).get();
 async function pintarTabla(ventaGarray) {
 
     var items = document.getElementById("tabla4");
@@ -534,8 +536,9 @@ async function pintarTabla(ventaGarray) {
     suma = 0;
     for (let i = 0; i < ventaGarray.length; i++) {
         querySnapshot = await obtenerProductoIN(ventaGarray[i].idProducto);
-
+        var encontrado=false;
         querySnapshot.forEach((doc) => {
+            encontrado=true;
             suma += ventaGarray[i].valorProducto * ventaGarray[i].cantidad;
             var datos = doc.data();
             items.innerHTML += `
@@ -553,6 +556,25 @@ async function pintarTabla(ventaGarray) {
             botonGuardar.innerHTML = `<button class="btn btn-success" onclick="GuardarPedido()">Guardar</button>`;
 
         })
+        if(!encontrado){
+            var doc=await obtenerTrago(ventaGarray[i].idProducto)
+            suma += ventaGarray[i].valorProducto * ventaGarray[i].cantidad;
+            var datos = doc.data();
+            items.innerHTML += `
+                <tr>
+                    <td>${doc.id}</td>
+                    <td>${datos.DESCRIPCION}</td>
+                    <td>-</td>
+                    <td><a id="${doc.id}" class="cursor" onclick="CambiarValor(this)">${ventaGarray[i].valorProducto}</a></td>
+                    <td><a id="${doc.id}" class="cursor" onclick="CambiarCantidad(this)">${ventaGarray[i].cantidad}</a></td>
+                    <th><a id="${doc.id}" class="cursor" onclick="EliminarItem(this)"><img src="img/delete.png" width=20></a></th>
+                </tr>
+                `;
+            var botonGuardar = document.getElementById("botonGuadar");
+
+            botonGuardar.innerHTML = `<button class="btn btn-success" onclick="GuardarPedido()">Guardar</button>`;
+
+        }
 
     }
     var cantidad = document.getElementById("cantidadVenta");
@@ -567,10 +589,10 @@ async function pintarTabla(ventaGarray) {
 }
 function EliminarItem(element) {
     var idElemento = element.id;
+    console.log(idElemento)
     for (let i = 0; i < ventaGarray.length; i++) {
         if (idElemento == ventaGarray[i].idProducto) {
             ventaGarray.splice(i, 1);
-
         }
     }
     pintarTabla(ventaGarray);

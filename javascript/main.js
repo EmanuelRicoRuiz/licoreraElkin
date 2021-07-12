@@ -554,12 +554,19 @@ function onKeyUp(element, event) {
                 var valor = document.getElementById("valor");
                 valor.value = datos.PRECIO_VENTA;
             }).catch((error) => {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Producto inválido',
-                    text: 'El producto no existe',
-        
-                }) 
+                db.collection("tragos").doc(element.value).get().then(doc => {
+                    var datos = doc.data();
+                    var valor = document.getElementById("valor");
+                    valor.value = datos.valorTrago;
+                }).catch((error) => {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Producto inválido',
+                        text: 'El producto no existe',
+            
+                    }) 
+                });
+
             });
             
         }
@@ -676,10 +683,21 @@ async function pedidosGenerales() {
             querySnapshot.forEach((doc) => {
                 var datos = doc.data();
                 var option = document.createElement("option");
+                option.id=doc.id;
                 option.value = datos.CODIGO;
                 option.text = `Nombre: ${datos.DESCRIPCION}\n Cantidad: ${datos.STOCK}`;
                 listaProductos.appendChild(option);
             });
+        })
+        db.collection("tragos").get().then((querySnapshot)=>{
+            querySnapshot.forEach((doc)=>{
+                var datos=doc.data();
+                var option = document.createElement("option");
+                option.id=doc.id;
+                option.value = doc.id;
+                option.text = `Nombre: ${datos.DESCRIPCION}`;
+                listaProductos.appendChild(option);
+            })
         })
     var clientes = document.getElementById("clientes")
     var user = firebase.auth().currentUser;
