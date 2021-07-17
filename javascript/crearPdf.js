@@ -45,7 +45,7 @@ function facturaPdf(element) {
                 var data = [];
                 var cantidades = datos.cantidades;
                 var idProducto = datos.idProducto;
-                var descuentos =datos.descuentos;
+                var valor =datos.valor;
                 var cont = 0;
                 var sumaTotal = 0;
                 var sumaDescuentos = 0;
@@ -56,7 +56,7 @@ function facturaPdf(element) {
                                 datos4 = doc4.data();
 
                                
-                                data.push([ingresar(cantidades[i]), datos4.DESCRIPCION, ingresar(descuentos[i])]);
+                                data.push([ingresar(cantidades[i]), datos4.DESCRIPCION, ingresar(valor[i])]);
                                 sumaTotal += cantidades[i] * datos4.PRECIO_VENTA;
                                 
                                 xp = 10;

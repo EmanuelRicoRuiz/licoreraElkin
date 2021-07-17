@@ -137,8 +137,7 @@ function ventasGenerales() {
     <center>
     <ul class="tabs">
         <li><a href="#tab1"><span class="fa fa-home"></span><span class="tab-text">Lista de ventas</span></a></li>
-        <li><a href="#tab2"><span class="fa fa-group"></span><span class="tab-text">Recaudo</span></a></li>
-        <li><a href="#tab3"><span class="fa fa-group"></span><span class="tab-text">Lista de vencidas</span></a></li>
+        
     </ul>
     </center>
     <div class="secciones">
@@ -147,16 +146,7 @@ function ventasGenerales() {
             <div id="tabOne">
             </div>
         </article>
-        <article id="tab2">
-            <div id="tabTwo">
-            
-            </div>
-        </article>
-        <article id="tab3">
-            <div id="tabTree">
-            
-            </div>
-        </article>
+        
         
 
         
@@ -165,11 +155,10 @@ function ventasGenerales() {
     cargarTabs();
     var hoy = new Date();
 
-    tabOneVentasG(hoy.getMonth() + 1, hoy.getFullYear());
-    tabTwoVentasG(hoy.getMonth() + 1, hoy.getFullYear());
-    tabTreeVentasG(hoy.getMonth() + 1, hoy.getFullYear());
-    LlenarFechas(true, true, true);
-}
+    tabOneVentasG(hoy.getDate(), hoy.getMonth() + 1, hoy.getFullYear());
+
+    LlenarFechas(true);
+}/*
 function tabTreeVentasG(mes, año) {
     var tabTree = document.getElementById("tabTree");
     tabTree.innerHTML = `
@@ -199,7 +188,7 @@ function tabTreeVentasG(mes, año) {
     meses.value = mes;
     años.value = año;
 
-    db.collection("ventas").orderBy("NumeroFactura", "desc").where("entregado", "==", true).get().then(querySnapshot=> {
+    db.collection("ventas").orderBy("NumeroFactura", "desc").where("entregado", "==", true).get().then(querySnapshot => {
         querySnapshot.forEach((doc) => {
             var datos = doc.data();
 
@@ -378,20 +367,18 @@ function tabTwoVentasG(mes, año) {
         })
 
     })
-
-
-
-
-
-
-
-}
-function tabOneVentasG(mes, año) {
+}*/
+function tabOneVentasG(dia, mes, año) {
     var tabOne = document.getElementById("tabOne");
     tabOne.innerHTML = `
     <div >
     <h3>Filtros:</h3>
     <div class="OuterMostClass row">
+    <div class="outerClass2 col-md-4">
+        <select id="dias1" class="form-control">
+            <option value="" >Seleccione el dia</option>
+        </select>
+    </div>
     <div class="outerClass col-md-4">
         <select id="meses1" class="form-control">
             <option value="" >Seleccione el mes</option>
@@ -409,17 +396,15 @@ function tabOneVentasG(mes, año) {
     </div>
     <hr>
     `
-
-    db.collection("ventas").orderBy("NumeroFactura", "desc").get().then(querySnapshot=> {
+    
+    dia=parseInt(dia,10);
+    mes=parseInt(mes,10);
+    año=parseInt(año,10);
+    console.log(dia,mes,año)
+    db.collection("ventas").where("diaV", "==", dia).where("mesV", "==", mes).where("añoV", "==", año).get().then(querySnapshot => {
         querySnapshot.forEach((doc) => {
             var datos = doc.data();
-            var fechaVencimiento = new Date(datos.fechaVencimiento[2], datos.fechaVencimiento[1] - 1, datos.fechaVencimiento[0])
-            var fechaActual = new Date();
-
-            if (fechaActual < fechaVencimiento && datos.entregado && mes == datos.fecha[1] && año == datos.fecha[2]) {
-
-
-                tabOne.innerHTML += `<div class="overflow-auto"><table  class="table table-striped table-bordered" id="Cabecera${doc.id}">
+            tabOne.innerHTML += `<div class="overflow-auto"><table  class="table table-striped table-bordered" id="Cabecera${doc.id}">
                 <tr>
                     <th>Número de factura</th>
                     <th>Cliente</th>
@@ -435,10 +420,10 @@ function tabOneVentasG(mes, año) {
                 </tr>
             </table></div>`;
 
-                var tablaPedidos = document.getElementById("Cabecera" + doc.id);
+            var tablaPedidos = document.getElementById("Cabecera" + doc.id);
 
 
-                tablaPedidos.innerHTML += `
+            tablaPedidos.innerHTML += `
                 <tr>
                     <td>${datos.NumeroFactura}</td>
                     <td id="${datos.cliente}${datos.NumeroFactura}"></td>
@@ -462,14 +447,14 @@ function tabOneVentasG(mes, año) {
                 </tr>
                 
                     `
-                db.collection("clientes").where("nit", "==", datos.cliente).get().then((querySnapshot) => {
-                    querySnapshot.forEach((doc2) => {
-                        var datosCliente = document.getElementById(`${datos.cliente}${datos.NumeroFactura}`);
-                        datos2 = doc2.data();
-                        datosCliente.innerHTML = `${datos2.RazonSocial}`
-                    })
+            db.collection("clientes").where("nit", "==", datos.cliente).get().then((querySnapshot) => {
+                querySnapshot.forEach((doc2) => {
+                    var datosCliente = document.getElementById(`${datos.cliente}${datos.NumeroFactura}`);
+                    datos2 = doc2.data();
+                    datosCliente.innerHTML = `${datos2.RazonSocial}`
                 })
-            }
+            })
+
         })
 
 
@@ -479,12 +464,16 @@ function tabOneVentasG(mes, año) {
 
 }
 function FiltrarG(element) {
+    console.log("entró");
     var id = element.id;
     if (id == "1") {
         var meses = document.getElementById("meses1").value;
         var años = document.getElementById("años1").value;
-        if (meses != "" && años != "") {
-            tabOneVentas(meses, años);
+        var dias=document.getElementById("dias1").value;
+       
+        if (meses != "" && años != ""&& dias!="") {
+            
+            tabOneVentasG(dias,meses, años);
             LlenarFechas(true, false, false);
         }
 
@@ -546,35 +535,37 @@ function Proveedores() {
     ListarProveedores();
 }
 function onKeyUp(element, event) {
-    
-        if (event.keyCode == "13" || event.keyCode == "69") {
-            console.log(element.value);
-            db.collection("productos").doc(element.value).get().then(doc => {
+
+    if (event.keyCode == "13" || event.keyCode == "69") {
+        console.log(element.value);
+        var encontrado = false;
+        db.collection("productos").doc(element.value).get().then(doc => {
+            var datos = doc.data();
+            var valor = document.getElementById("valor");
+            valor.value = datos.PRECIO_VENTA;
+
+        }).catch((error) => {
+            db.collection("tragos").doc(element.value).get().then(doc => {
                 var datos = doc.data();
                 var valor = document.getElementById("valor");
-                valor.value = datos.PRECIO_VENTA;
+                valor.value = datos.valorTrago;
             }).catch((error) => {
-                db.collection("tragos").doc(element.value).get().then(doc => {
-                    var datos = doc.data();
-                    var valor = document.getElementById("valor");
-                    valor.value = datos.valorTrago;
-                }).catch((error) => {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Producto inválido',
-                        text: 'El producto no existe',
-            
-                    }) 
-                });
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Producto inválido',
+                    text: 'El producto no existe',
 
+                })
             });
-            
-        }
 
-    
+        });
+
+    }
+
+
 
 }
-const obtenerVentasSinEntregar = () => db.collection("ventas").orderBy("NumeroFactura", "desc").where("entregado", "==", false).get();
+const obtenerVentasSinEntregar = (dia) => db.collection("ventas").orderBy("NumeroFactura", "desc").where("diaV", "==", dia).get();
 
 async function pedidosGenerales() {
     var main = document.getElementById("main");
@@ -667,8 +658,18 @@ async function pedidosGenerales() {
             </div>
         </article>
         <article id="tab2">
+        <div id="ventasHoy">
+            <table class="table table-striped table-bordered" id="gananciaventa">
+                <tr>
+                    <th>Ventas Hoy</th>
+                    <th>Ganancia</th>
+                </tr>
+            </table>
+        </div>
+        <h3>Lista de pedidos: </h3>
             <div id="tabTwo">
-            <h3>Lista de pedidos: </h3>
+            
+            
             </div>
         </article>
         
@@ -677,28 +678,28 @@ async function pedidosGenerales() {
     </div>
 </div>
   `;
-    
-        var listaProductos = document.getElementById("productos")
-        db.collection("productos").get().then((querySnapshot) => {
-            querySnapshot.forEach((doc) => {
-                var datos = doc.data();
-                var option = document.createElement("option");
-                option.id=doc.id;
-                option.value = datos.CODIGO;
-                option.text = `Nombre: ${datos.DESCRIPCION}\n Cantidad: ${datos.STOCK}`;
-                listaProductos.appendChild(option);
-            });
+
+    var listaProductos = document.getElementById("productos")
+    db.collection("productos").get().then((querySnapshot) => {
+        querySnapshot.forEach((doc) => {
+            var datos = doc.data();
+            var option = document.createElement("option");
+            option.id = doc.id;
+            option.value = datos.CODIGO;
+            option.text = `Nombre: ${datos.DESCRIPCION}\n Cantidad: ${datos.STOCK}`;
+            listaProductos.appendChild(option);
+        });
+    })/*
+    db.collection("tragos").get().then((querySnapshot) => {
+        querySnapshot.forEach((doc) => {
+            var datos = doc.data();
+            var option = document.createElement("option");
+            option.id = doc.id;
+            option.value = doc.id;
+            option.text = `Nombre: ${datos.DESCRIPCION}`;
+            listaProductos.appendChild(option);
         })
-        db.collection("tragos").get().then((querySnapshot)=>{
-            querySnapshot.forEach((doc)=>{
-                var datos=doc.data();
-                var option = document.createElement("option");
-                option.id=doc.id;
-                option.value = doc.id;
-                option.text = `Nombre: ${datos.DESCRIPCION}`;
-                listaProductos.appendChild(option);
-            })
-        })
+    })*/
     var clientes = document.getElementById("clientes")
     var user = firebase.auth().currentUser;
     user = user.uid
@@ -717,38 +718,43 @@ async function pedidosGenerales() {
         });
     })
     cargarTabs();
-
     var tabTwo = document.getElementById("tabTwo");
     var user = firebase.auth().currentUser;
     user = user.uid;
-    var ventas = await obtenerVentasSinEntregar();
+    var fecha = new Date();
+    dia = fecha.getDate();
+    mes = fecha.getMonth() + 1;
+    año = fecha.getFullYear();
+    console.log(dia - 2, 7, 2021)
+    var ventas = await obtenerVentasSinEntregar(dia);
     var posiciones = [];
-
+    var ventasHoy = document.getElementById("gananciaventa");
+    var suma1 = 0;
+    var suma2 = 0;
     ventas.forEach((doc) => {
 
         var datos = doc.data();
-        tabTwo.innerHTML += `<div class="overflow-auto"><table  class="table table-striped table-bordered" id="Cabecera${doc.id}">
+        if (datos.mesV == mes && datos.añoV == año) {
+
+
+            tabTwo.innerHTML += `<div class="overflow-auto"><table  class="table table-striped table-bordered" id="Cabecera${doc.id}">
                     <tr>
                         <th>Número de factura</th>
-                        <th>Estado de entrega</th>
-                        <th>Estado de pago</th>
                         <th>Valor</th>
-                        <th>debe</th>
                         <th>fecha</th>
                         <th>Rentabilidad</th>
                         <th>Plazo</th>
                        
                     </tr>
                 </table></div>`;
-        var tablaPedidos = document.getElementById("Cabecera" + doc.id);
-        tablaPedidos.innerHTML += `
+            var tablaPedidos = document.getElementById("Cabecera" + doc.id);
+            tablaPedidos.innerHTML += `
                     <tr>
                         <td>${datos.NumeroFactura}</td>
-                        <td>${datos.entregado}</td>
-                        <td>${datos.pagado}</td>
+                        
                         <td>${ingresar(datos.suma)}</td>
-                        <td>${ingresar(datos.debe)}</td>
-                        <td>${datos.fecha[0]}/${datos.fecha[1]}/${datos.fecha[2]}</td>
+                        
+                        <td>${datos.diaV}/${datos.mesV}/${datos.añoV}</td>
                         <td>${datos.rentabilidad.toFixed(2)}%</td>
                         <td>${datos.plazo} Dias</td>
                         <td><a class="cursor" id="${doc.id}" onclick="AbonarPedido(this)"><img src="img/abono.png" width=30></a>
@@ -764,8 +770,15 @@ async function pedidosGenerales() {
                     </tr>
                     
                         `
+            suma2 += datos.suma * (datos.rentabilidad / 100);
+            suma1 += datos.suma;
+        }
     })
-
+    console.log(suma1)
+    ventasHoy.innerHTML += `
+        <td>$${ingresar(suma1)}</td>
+        <td>$${ingresar(suma2.toFixed(2))}</td>
+    `;
 }
 function ListarProveedores() {
     var tabTwo = document.getElementById("tabTwo");
@@ -1095,8 +1108,7 @@ function ventas() {
     var hoy = new Date();
 
     tabOneVentas(hoy.getMonth() + 1, hoy.getFullYear());
-    tabTwoVentas(hoy.getMonth() + 1, hoy.getFullYear());
-    tabTreeVentas(hoy.getMonth() + 1, hoy.getFullYear());
+
     LlenarFechas(true, true, true);
 }
 
@@ -1155,10 +1167,7 @@ function FiltrarG(element) {
 function LlenarFechas(uno, dos, tres) {
     var meses = document.getElementById("meses1");
     var años = document.getElementById("años1");
-    var meses2 = document.getElementById("meses2");
-    var años2 = document.getElementById("años2");
-    var meses3 = document.getElementById("meses3");
-    var años3 = document.getElementById("años3");
+    var dias=document.getElementById("dias1");
     if (uno) {
         for (let i = 1; i < 13; i++) {
             var option = document.createElement("option");
@@ -1176,44 +1185,20 @@ function LlenarFechas(uno, dos, tres) {
             años.appendChild(option);
 
         }
+        for (let i = 1; i < 32; i++) {
+            var option = document.createElement("option");
+            option.value = i;
+            option.text = i;
+            dias.appendChild(option);
+
+        }
+        
     }
     if (dos) {
-        for (let i = 1; i < 13; i++) {
-            var option = document.createElement("option");
-            option.value = i;
-            option.text = i;
-
-            meses2.appendChild(option);
-
-        }
-        var hoy = new Date();
-        año = hoy.getFullYear();
-        for (let i = año; i > 2000 - 1; i--) {
-            var option = document.createElement("option");
-            option.value = i;
-            option.text = i;
-
-            años2.appendChild(option);
-
-        }
+       
     }
     if (tres) {
-        for (let i = 1; i < 13; i++) {
-            var option = document.createElement("option");
-            option.value = i;
-            option.text = i;
-
-            meses3.appendChild(option);
-        }
-        var hoy = new Date();
-        año = hoy.getFullYear();
-        for (let i = año; i > 2000 - 1; i--) {
-            var option = document.createElement("option");
-            option.value = i;
-            option.text = i;
-
-            años3.appendChild(option);
-        }
+        
     }
 
 }

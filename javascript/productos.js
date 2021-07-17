@@ -486,7 +486,7 @@ function Emitir() {
     var cantidad = document.getElementById("cantidadVenta").value;
     var idProducto = document.getElementById("productos1").value;
     var valorProducto = document.getElementById("valor").value;
-    
+
     if (cantidad != "") {
         if (idProducto != "") {
             if (valorProducto != "") {
@@ -536,9 +536,9 @@ async function pintarTabla(ventaGarray) {
     suma = 0;
     for (let i = 0; i < ventaGarray.length; i++) {
         querySnapshot = await obtenerProductoIN(ventaGarray[i].idProducto);
-        var encontrado=false;
+        var encontrado = false;
         querySnapshot.forEach((doc) => {
-            encontrado=true;
+            encontrado = true;
             suma += ventaGarray[i].valorProducto * ventaGarray[i].cantidad;
             var datos = doc.data();
             items.innerHTML += `
@@ -556,8 +556,8 @@ async function pintarTabla(ventaGarray) {
             botonGuardar.innerHTML = `<button class="btn btn-success" onclick="GuardarPedido()">Guardar</button>`;
 
         })
-        if(!encontrado){
-            var doc=await obtenerTrago(ventaGarray[i].idProducto)
+        if (!encontrado) {
+            var doc = await obtenerTrago(ventaGarray[i].idProducto)
             suma += ventaGarray[i].valorProducto * ventaGarray[i].cantidad;
             var datos = doc.data();
             items.innerHTML += `
@@ -739,61 +739,65 @@ function CambiarValor(element) {
 
 }
 const obtenerProducto = (id) => db.collection("productos").where("CODIGO", "==", id).get();
+
 async function GuardarPedido() {
     var cliente = document.getElementById("clientes1").value;
     if (cliente != "") {
         var cantidades = [];
         var idProducto = [];
-        var descuentos = [];
+        var valor = [];
         for (let i = 0; i < ventaGarray.length; i++) {
             cantidades[i] = ventaGarray[i].cantidad;
             idProducto[i] = ventaGarray[i].idProducto;
-            descuentos[i] = ventaGarray[i].valorProducto;
+            valor[i] = ventaGarray[i].valorProducto;
         }
         var entrada = true;
         var suma = 0
         var sumaCosto = 0
         for (let i = 0; i < idProducto.length; i++) {
             var query = await obtenerProducto(idProducto[i]);
+            var encontrado=false;
             query.forEach(doc => {
+                encontrado=true;
                 datos = doc.data();
                 if (datos.STOCK < cantidades[i]) {
                     entrada = false;
                 } else {
-                    suma = suma + (cantidades[i] * descuentos[i])
+                    suma = suma + (cantidades[i] * valor[i])
                     sumaCosto = sumaCosto + (cantidades[i] * datos.PRECIO_COMPRA)
                     var CODIGO = datos.CODIGO;
-                        var DESCRIPCION = datos.DESCRIPCION;
-                        var STOCK = datos.STOCK;
-                        var LIMITE_INFERIOR = datos.LIMITE_INFERIOR;
-                        var PRECIO_VENTA = datos.PRECIO_VENTA;
-                        var VOLUMEN_GANANCIA = datos.VOLUMEN_GANANCIA;
-                        var PRECIO_COMPRA = datos.PRECIO_COMPRA;
-                        var registradoPor = datos.registradoPor;
-                        var PORCENTAJE = datos.PORCENTAJE;
-                        STOCK = STOCK - cantidades[i];
-                        var CATEGORIA = datos.CATEGORIA;
-                        var fraccionado = datos.fraccionado;
-                        var valorTrago = datos.valorTrago;
-                        var ventasTrago = datos.ventasTrago;
-                        db.collection("productos").doc(doc.id).set({
-                            CODIGO,
-                            DESCRIPCION,
-                            PRECIO_COMPRA,
-                            PRECIO_VENTA,
-                            STOCK,
-                            CATEGORIA,
-                            LIMITE_INFERIOR,
-                            registradoPor,
-                            VOLUMEN_GANANCIA,
-                            PORCENTAJE,
-                            fraccionado,
-                            valorTrago,
-                            ventasTrago
-                        })
-                    
+                    var DESCRIPCION = datos.DESCRIPCION;
+                    var STOCK = datos.STOCK;
+                    var LIMITE_INFERIOR = datos.LIMITE_INFERIOR;
+                    var PRECIO_VENTA = datos.PRECIO_VENTA;
+                    var VOLUMEN_GANANCIA = datos.VOLUMEN_GANANCIA;
+                    var PRECIO_COMPRA = datos.PRECIO_COMPRA;
+                    var registradoPor = datos.registradoPor;
+                    var PORCENTAJE = datos.PORCENTAJE;
+                    STOCK = STOCK - cantidades[i];
+                    var CATEGORIA = datos.CATEGORIA;
+                    var fraccionado = datos.fraccionado;
+                    var valorTrago = datos.valorTrago;
+                    var ventasTrago = datos.ventasTrago;
+                    db.collection("productos").doc(doc.id).set({
+                        CODIGO,
+                        DESCRIPCION,
+                        PRECIO_COMPRA,
+                        PRECIO_VENTA,
+                        STOCK,
+                        CATEGORIA,
+                        LIMITE_INFERIOR,
+                        registradoPor,
+                        VOLUMEN_GANANCIA,
+                        PORCENTAJE,
+                        fraccionado,
+                        valorTrago,
+                        ventasTrago
+                    })
+
                 }
             })
+            
 
 
 
@@ -836,13 +840,24 @@ async function GuardarPedido() {
                         if (debe < suma) {
                             console.log(suma - debe);
                         }
+                        var diaV = fecha[0];
+                        var mesV = fecha[1];
+                        var añoV = fecha[2];
+                        var diaF = fechaVencimiento[0];
+                        var mesF = fechaVencimiento[1];
+                        var añoF = fechaVencimiento[2];
                         db.collection("ventas").doc().set({
                             cantidades,
                             idProducto,
-                            descuentos,
+                            valor,
                             entregado,
                             vendedor,
-                            fecha,
+                            diaV,
+                            mesV,
+                            añoV,
+                            diaF,
+                            mesF,
+                            añoF,
                             pagado,
                             suma,
                             debe,
@@ -850,7 +865,6 @@ async function GuardarPedido() {
                             NumeroFactura,
                             rentabilidad,
                             plazo,
-                            fechaVencimiento
 
 
                         })
@@ -859,7 +873,7 @@ async function GuardarPedido() {
                 })
                 var botonGuadar = document.getElementById("botonGuadar");
                 botonGuadar.innerHTML = "";
-                ventaGarray=[];
+                ventaGarray = [];
                 pintarTabla(ventaGarray)
                 Swal.fire('Guardado!', '', 'success');
 

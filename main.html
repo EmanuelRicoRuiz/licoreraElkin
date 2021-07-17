@@ -174,13 +174,13 @@
                 })
             });
         }
-        /*
+        
         async function mudar() {
             db.collection("aux").get().then((querySnapshot) => {
                 querySnapshot.forEach( async doc => {
                     var datos = doc.data();
                     NumeroFactura = datos.NumeroFactura;
-                    if (NumeroFactura <= 193) {
+                    if (NumeroFactura < 193) {
                         iter+=1
                         cantidades = datos.cantidades;
                         idProducto = datos.idProducto;
@@ -206,83 +206,225 @@
                 })
             })
         }*/
-/*
-        const obtenerCorreccionVentas = () => db.collection("ventas").orderBy("NumeroFactura", "desc").get();
-        ventas1();
-        async function ventas1() {
-            var cont = 0
-            var query = await obtenerCorreccionVentas();
-            var ventasArray = [];
-            var ids=[]
-            query.forEach(doc => {
-                var datos = doc.data();
-                var num = datos.NumeroFactura;
-                ventasArray.push(num)
-                ids.push(doc.id)
-            });
-            console.log(ventasArray)
-            duplicados=[];
-            duplicadosIds=[];
-            for (let i = 0; i < ventasArray.length; i++) {
-                if (ventasArray[i + 1] === ventasArray[i]) {
-                    duplicados.push(ventasArray[i]);
-                    duplicadosIds.push(ids[i]);
+        /*
+                const obtenerCorreccionVentas = () => db.collection("ventas").orderBy("NumeroFactura", "desc").get();
+                ventas1();
+                async function ventas1() {
+                    var cont = 0
+                    var query = await obtenerCorreccionVentas();
+                    var ventasArray = [];
+                    var ids=[]
+                    query.forEach(doc => {
+                        var datos = doc.data();
+                        var num = datos.NumeroFactura;
+                        ventasArray.push(num)
+                        ids.push(doc.id)
+                    });
+                    console.log(ventasArray)
+                    duplicados=[];
+                    duplicadosIds=[];
+                    for (let i = 0; i < ventasArray.length; i++) {
+                        if (ventasArray[i + 1] === ventasArray[i]) {
+                            duplicados.push(ventasArray[i]);
+                            duplicadosIds.push(ids[i]);
+                        }
+                        else{
+                            console.log("no repetido")
+                        }
+                    }
+                    
+                        console.log(duplicados);
+                        console.log(duplicadosIds);
+                        /*for(let i=0;i<duplicadosIds.length;i++){
+                            db.collection("ventas").doc(duplicadosIds[i]).delete();
+                        }
+        
                 }
-                else{
-                    console.log("no repetido")
-                }
-            }
-            
-                console.log(duplicados);
-                console.log(duplicadosIds);
-                /*for(let i=0;i<duplicadosIds.length;i++){
-                    db.collection("ventas").doc(duplicadosIds[i]).delete();
-                }
-
-        }
-
-        async function respaldo() {
-            db.collection("aux").get().then((querySnapshot) => {
-                querySnapshot.forEach(doc => {
-                    var datos = doc.data();
-                    cantidades = datos.cantidades;
-                    idProducto = datos.idProducto;
-                    descuentos = datos.descuentos;
-                    entregado = datos.entregado;
-                    vendedor = datos.vendedor;
-                    fecha = datos.fecha;
-                    pagado = datos.pagado
-                    suma = datos.suma;
-                    debe = datos.debe
-                    cliente = datos.cliente
-                    NumeroFactura = datos.NumeroFactura;
-                    rentabilidad = datos.rentabilidad;
-                    plazo = datos.plazo;
-                    fechaVencimiento = datos.fechaVencimiento;
-                    db.collection("ventas").doc(doc.id).set({
-                        cantidades,
-                        idProducto,
-                        descuentos,
-                        entregado,
-                        vendedor,
-                        fecha,
-                        pagado,
-                        suma,
-                        debe,
-                        cliente,
-                        NumeroFactura,
-                        rentabilidad,
-                        plazo,
-                        fechaVencimiento
+        
+                async function respaldo() {
+                    db.collection("aux").get().then((querySnapshot) => {
+                        querySnapshot.forEach(doc => {
+                            var datos = doc.data();
+                            cantidades = datos.cantidades;
+                            idProducto = datos.idProducto;
+                            descuentos = datos.descuentos;
+                            entregado = datos.entregado;
+                            vendedor = datos.vendedor;
+                            fecha = datos.fecha;
+                            pagado = datos.pagado
+                            suma = datos.suma;
+                            debe = datos.debe
+                            cliente = datos.cliente
+                            NumeroFactura = datos.NumeroFactura;
+                            rentabilidad = datos.rentabilidad;
+                            plazo = datos.plazo;
+                            fechaVencimiento = datos.fechaVencimiento;
+                            db.collection("ventas").doc(doc.id).set({
+                                cantidades,
+                                idProducto,
+                                descuentos,
+                                entregado,
+                                vendedor,
+                                fecha,
+                                pagado,
+                                suma,
+                                debe,
+                                cliente,
+                                NumeroFactura,
+                                rentabilidad,
+                                plazo,
+                                fechaVencimiento
+                            })
+                            console.log("respaldado");
+        
+                        });
+        
                     })
-                    console.log("respaldado");
-
-                });
-
+                }
+        */
+        const obtenerVentas = () => db.collection("aux").get();
+        const obtenerAux = (dia) => db.collection("aux").where("diaV", "==", dia).get();
+       
+        var cont=0;
+        async function ventas2() {
+            var ventas = await obtenerVentas();
+            ventas.forEach(doc => {
+                var datos = doc.data();
+                var cantidades = datos.cantidades;
+                var idProducto = datos.idProducto;
+                var valor = datos.valor;
+                var entregado = datos.entregado;
+                var vendedor = datos.vendedor;
+                var fecha = datos.fecha;
+                var pagado = datos.pagado
+                var suma = datos.suma;
+                var debe = datos.debe
+                var cliente = datos.cliente
+                var NumeroFactura = datos.NumeroFactura;
+                var rentabilidad = datos.rentabilidad;
+                var plazo = datos.plazo;
+                var fechaVencimiento = datos.fechaVencimiento;
+                /*console.log(cantidades,
+                    idProducto,
+                    descuentos,
+                    entregado,
+                    vendedor,
+                    fecha,
+                    pagado,
+                    suma,
+                    debe,
+                    cliente,
+                    NumeroFactura,
+                    rentabilidad,
+                    plazo,
+                    fechaVencimiento)*/
+                var diaV = datos.diaV;
+                var mesV = datos.mesV;
+                var añoV = datos.añoV;
+                var diaF = datos.diaF;
+                var mesF = datos.mesF;
+                var añoF = datos.añoF;
+                db.collection("ventas").doc(doc.id).set({
+                    cantidades,
+                    idProducto,
+                    valor,
+                    entregado,
+                    vendedor,
+                    diaV,
+                    mesV,
+                    añoV,
+                    diaF,
+                    mesF,
+                    añoF,
+                    pagado,
+                    suma,
+                    debe,
+                    cliente,
+                    NumeroFactura,
+                    rentabilidad,
+                    plazo,
+                })
+                
+                
+                    cont+=1;
+                
+            });
+            console.log(cont);
+        }/*
+        async function aux(){
+            var fecha=new Date();
+            dia=fecha.getDate();
+            var aux1=await obtenerAux(dia-1);
+            aux1.forEach(doc=>{
+                var datos=doc.data();
+                console.log(datos);
             })
         }
-*/
+        aux();*/
+        const obtener = (id) => db.collection("productos").doc(id).get();
+        async function mudar() {
+            db.collection("aux").get().then((querySnapshot) => {
+                querySnapshot.forEach(async doc => {
+                    var datos = doc.data();
+                    var NumeroFactura = datos.NumeroFactura;
+                    if (NumeroFactura < 193) {
+                        var cantidades = datos.cantidades;
+                        var idProducto = datos.idProducto;
+                        var descuentos = datos.descuentos;
+                        var entregado = datos.entregado;
+                        var vendedor = datos.vendedor;
+                        var pagado = datos.pagado
+                        var suma = datos.suma;
+                        var debe = datos.debe
+                        var cliente = datos.cliente
+                        var rentabilidad = datos.rentabilidad;
+                        var plazo = datos.plazo;
+                        var valor = [];
+                        cont = 0;
+                        var diaV = datos.diaV;
+                        var mesV = datos.mesV;
+                        var añoV = datos.añoV;
+                        var diaF = datos.diaF;
+                        var mesF = datos.mesF;
+                        var añoF = datos.añoF;
+                        console.log(diaV, mesV, añoV, diaF, mesF, añoF)
+                        for (let i = 0; i < idProducto.length; i++) {
+                            var doc2 = await obtener(idProducto[i]);
+                            var datos2 = doc2.data();
+                            if (datos2 != undefined) {
+                                PRECIO_VENTA = datos2.PRECIO_VENTA;
+                                valor.push(PRECIO_VENTA);
+                            }
+                        }
+                        if (diaV != undefined && mesV != undefined && añoV != undefined && diaF != undefined && añoF != undefined) {
+                            db.collection("aux2").doc(doc.id).set({
+                                cantidades,
+                                idProducto,
+                                valor,
+                                entregado,
+                                vendedor,
+                                diaV,
+                                mesV,
+                                añoV,
+                                diaF,
+                                mesF,
+                                añoF,
+                                pagado,
+                                suma,
+                                debe,
+                                cliente,
+                                NumeroFactura,
+                                rentabilidad,
+                                plazo,
+                            })
+                        }
 
+
+                    }
+
+                })
+            })
+        }
     </script>
 </body>
 
