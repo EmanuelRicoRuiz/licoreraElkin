@@ -282,72 +282,67 @@
                     })
                 }
         */
-        const obtenerVentas = () => db.collection("aux").get();
+        const obtenerVentas = () => db.collection("ventas").get();
         const obtenerAux = (dia) => db.collection("aux").where("diaV", "==", dia).get();
-       
-        var cont=0;
+        
+        var cont = 0;
         async function ventas2() {
             var ventas = await obtenerVentas();
             ventas.forEach(doc => {
                 var datos = doc.data();
-                var cantidades = datos.cantidades;
-                var idProducto = datos.idProducto;
-                var valor = datos.valor;
-                var entregado = datos.entregado;
-                var vendedor = datos.vendedor;
-                var fecha = datos.fecha;
-                var pagado = datos.pagado
-                var suma = datos.suma;
-                var debe = datos.debe
-                var cliente = datos.cliente
                 var NumeroFactura = datos.NumeroFactura;
-                var rentabilidad = datos.rentabilidad;
-                var plazo = datos.plazo;
-                var fechaVencimiento = datos.fechaVencimiento;
-                /*console.log(cantidades,
-                    idProducto,
-                    descuentos,
-                    entregado,
-                    vendedor,
-                    fecha,
-                    pagado,
-                    suma,
-                    debe,
-                    cliente,
-                    NumeroFactura,
-                    rentabilidad,
-                    plazo,
-                    fechaVencimiento)*/
-                var diaV = datos.diaV;
-                var mesV = datos.mesV;
-                var añoV = datos.añoV;
-                var diaF = datos.diaF;
-                var mesF = datos.mesF;
-                var añoF = datos.añoF;
-                db.collection("ventas").doc(doc.id).set({
-                    cantidades,
-                    idProducto,
-                    valor,
-                    entregado,
-                    vendedor,
-                    diaV,
-                    mesV,
-                    añoV,
-                    diaF,
-                    mesF,
-                    añoF,
-                    pagado,
-                    suma,
-                    debe,
-                    cliente,
-                    NumeroFactura,
-                    rentabilidad,
-                    plazo,
-                })
-                
-                
-                    cont+=1;
-                
+                if (NumeroFactura > 523) {
+                    var rentabilidad = datos.rentabilidad;
+                    var cantidades = datos.cantidades;
+                    var idProducto = datos.idProducto;
+                    var valor = datos.descuentos;
+                    var entregado = datos.entregado;
+                    var vendedor = datos.vendedor;
+                    var fecha = datos.fecha;
+                    var pagado = datos.pagado
+                    var suma = datos.suma;
+                    var debe = datos.debe
+                    var cliente = datos.cliente
+                    var NumeroFactura = datos.NumeroFactura;
+                    var rentabilidad = datos.rentabilidad;
+                    var plazo = datos.plazo;
+                    var fechaVencimiento = datos.fechaVencimiento;
+                    console.log(datos)
+                    var fechaVencimiento=datos.fechaVencimiento;
+                    var fecha=datos.fecha;
+                    var diaV = fecha[0];
+                    var mesV = fecha[1];
+                    var añoV = fecha[2];
+                    var diaF = fechaVencimiento[0];
+                    var mesF = fechaVencimiento[1];
+                    var añoF = fechaVencimiento[2];
+                    
+                    db.collection("ventas").doc(doc.id).set({
+                        cantidades,
+                        idProducto,
+                        valor,
+                        entregado,
+                        vendedor,
+                        diaV,
+                        mesV,
+                        añoV,
+                        diaF,
+                        mesF,
+                        añoF,
+                        pagado,
+                        suma,
+                        debe,
+                        cliente,
+                        NumeroFactura,
+                        rentabilidad,
+                        plazo
+                    })
+
+
+                    cont += 1;
+                }
+
+
             });
             console.log(cont);
         }/*
