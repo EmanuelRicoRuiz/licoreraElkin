@@ -70,9 +70,9 @@ async function carteraGeneral() {
                 <td>${datos.pagado}</td>
                 <td>${ingresar(datos.suma)}</td>
                 <td>${ingresar(datos.debe)}</td>
-                <td>${datos.fecha[0]}/${datos.fecha[1]}/${datos.fecha[2]}</td>
+                <td>${datos.diaV}/${datos.mesV}/${datos.añoV}</td>
                 <td>${datos.plazo} dias</td>
-                <td>${datos.fechaVencimiento[0]}/${datos.fechaVencimiento[1]}/${datos.fechaVencimiento[2]}</td>
+                <td>${datos.diaF}/${datos.mesF}/${datos.añoF}</td>
                 <td><a class="cursor" id="${doc.id}" onclick="AbonarPedido(this)"><img src="img/abono.png" width=30></a><br>
                 <a class="cursor" id="${doc.id}" onclick="facturaPdf(this)"><img src="img/factura.png" width=30></a><br>
                 <a class="cursor" id="${doc.id}" onclick="contenidoPedido(this)"><img src="img/contenido.png" width=30></a></td>

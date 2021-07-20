@@ -396,11 +396,11 @@ function tabOneVentasG(dia, mes, año) {
     </div>
     <hr>
     `
-    
-    dia=parseInt(dia,10);
-    mes=parseInt(mes,10);
-    año=parseInt(año,10);
-    console.log(dia,mes,año)
+
+    dia = parseInt(dia, 10);
+    mes = parseInt(mes, 10);
+    año = parseInt(año, 10);
+    console.log(dia, mes, año)
     db.collection("ventas").where("diaV", "==", dia).where("mesV", "==", mes).where("añoV", "==", año).get().then(querySnapshot => {
         querySnapshot.forEach((doc) => {
             var datos = doc.data();
@@ -469,11 +469,11 @@ function FiltrarG(element) {
     if (id == "1") {
         var meses = document.getElementById("meses1").value;
         var años = document.getElementById("años1").value;
-        var dias=document.getElementById("dias1").value;
-       
-        if (meses != "" && años != ""&& dias!="") {
-            
-            tabOneVentasG(dias,meses, años);
+        var dias = document.getElementById("dias1").value;
+
+        if (meses != "" && años != "" && dias != "") {
+
+            tabOneVentasG(dias, meses, años);
             LlenarFechas(true, false, false);
         }
 
@@ -565,8 +565,30 @@ function onKeyUp(element, event) {
 
 
 }
-const obtenerVentasSinEntregar = (dia) => db.collection("ventas").orderBy("NumeroFactura", "desc").where("diaV", "==", dia).get();
-
+const obtenerVentasSinEntregar = (dia, mes, año) => db.collection("ventas").where("mesV", "==", mes).where("añoV", "==", año).where("diaV", "==", dia).get();
+function ordenar(objeto) {
+    var array = [];
+    var lista = [];
+    objeto.forEach(doc => {
+        var datos = doc.data();
+        array.push(doc);
+        lista.push(datos.NumeroFactura);
+    })
+    n = lista.length;
+    for (k = 1; k < n; k++) {
+        for (i = 0; i < (n - k); i++) {
+            if (lista[i] > lista[i + 1]) {
+                aux = lista[i];
+                aux2 = array[i]
+                lista[i] = lista[i + 1];
+                lista[i + 1] = aux;
+                array[i] = array[i + 1];
+                array[i + 1] = aux2;
+            }
+        }
+    }
+    return array;
+}
 async function pedidosGenerales() {
     var main = document.getElementById("main");
     main.innerHTML = ``;
@@ -726,13 +748,16 @@ async function pedidosGenerales() {
     mes = fecha.getMonth() + 1;
     año = fecha.getFullYear();
     console.log(dia - 2, 7, 2021)
-    var ventas = await obtenerVentasSinEntregar(dia);
+    var ventas = await obtenerVentasSinEntregar(dia, mes, año);
+    var vector = ordenar(ventas);
+
     var posiciones = [];
     var ventasHoy = document.getElementById("gananciaventa");
     var suma1 = 0;
     var suma2 = 0;
-    ventas.forEach((doc) => {
-
+    console.log(vector[0].data())
+    for (let i = vector.length-1; i > -1; i--) {
+        var doc = vector[i];
         var datos = doc.data();
         if (datos.mesV == mes && datos.añoV == año) {
 
@@ -773,7 +798,7 @@ async function pedidosGenerales() {
             suma2 += datos.suma * (datos.rentabilidad / 100);
             suma1 += datos.suma;
         }
-    })
+    }
     console.log(suma1)
     ventasHoy.innerHTML += `
         <td>$${ingresar(suma1)}</td>
@@ -1137,7 +1162,7 @@ function Filtrar(element) {
             LlenarFechas(false, false, true);
         }
     }
-}
+}/*
 function FiltrarG(element) {
     var id = element.id;
     if (id == "1") {
@@ -1163,11 +1188,11 @@ function FiltrarG(element) {
             LlenarFechas(false, false, true);
         }
     }
-}
+}*/
 function LlenarFechas(uno, dos, tres) {
     var meses = document.getElementById("meses1");
     var años = document.getElementById("años1");
-    var dias=document.getElementById("dias1");
+    var dias = document.getElementById("dias1");
     if (uno) {
         for (let i = 1; i < 13; i++) {
             var option = document.createElement("option");
@@ -1192,13 +1217,13 @@ function LlenarFechas(uno, dos, tres) {
             dias.appendChild(option);
 
         }
-        
+
     }
     if (dos) {
-       
+
     }
     if (tres) {
-        
+
     }
 
 }
