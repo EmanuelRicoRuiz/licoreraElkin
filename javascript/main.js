@@ -396,7 +396,6 @@ function tabOneVentasG(dia, mes, año) {
     </div>
     <hr>
     `
-
     dia = parseInt(dia, 10);
     mes = parseInt(mes, 10);
     año = parseInt(año, 10);
@@ -756,7 +755,7 @@ async function pedidosGenerales() {
     var suma1 = 0;
     var suma2 = 0;
     console.log(vector[0].data())
-    for (let i = vector.length-1; i > -1; i--) {
+    for (let i = vector.length - 1; i > -1; i--) {
         var doc = vector[i];
         var datos = doc.data();
         if (datos.mesV == mes && datos.añoV == año) {
@@ -1227,16 +1226,16 @@ function LlenarFechas(uno, dos, tres) {
     }
 
 }
-function contenidoPedido(element) {
+const getProducto = (id) => db.collection("productos").doc(id).get();
+async function contenidoPedido(element) {
     var container = document.getElementById(`contenido${element.id}`);
-    db.collection("ventas").get().then((querySnapshot) => {
-        querySnapshot.forEach((doc) => {
-            if (doc.id == element.id) {
+    db.collection("ventas").doc(element.id).get().then(async (doc) => {
 
 
-                var datos = doc.data();
-                container.innerHTML =
-                    `<center><button class="btn btn-success btn-block" id="${element.id}" onclick="ocultarPedido(this)">Ocultar contenido</button></td></center>
+
+        var datos = doc.data();
+        container.innerHTML =
+            `<center><button class="btn btn-success btn-block" id="${element.id}" onclick="ocultarPedido(this)">Ocultar contenido</button></td></center>
                     <td colspan=10>
                     <table  class="table table-striped table-bordered" id="tabla${element.id}">
                         <tr>
@@ -1249,29 +1248,23 @@ function contenidoPedido(element) {
                     </td>
                 
             `
-                var contenido = document.getElementById("tabla" + element.id);
-                for (let i = 0; i < datos.cantidades.length; i++) {
-                    contenido.innerHTML += `
+        var contenido = document.getElementById("tabla" + element.id);
+        for (let i = 0; i < datos.cantidades.length; i++) {
+            var producto = await getProducto(datos.idProducto[i]);
+            producto = producto.data();
+            contenido.innerHTML += `
                         <tr>
                             <th>${datos.idProducto[i]}</th>
-                            <th id="${datos.NumeroFactura}${datos.idProducto[i]}${i}"></th>
+                            <th>${producto.DESCRIPCION}</th>
                             <th>${datos.cantidades[i]}</th>
                             <th>${datos.valor[i]}</th>
                         </tr>
 
                 `;
-                    var cont = 0;
-                    db.collection("productos").where("CODIGO", "==", datos.idProducto[i]).get().then((querySnapshot) => {
-                        querySnapshot.forEach((doc2) => {
-                            var nombre = document.getElementById(datos.NumeroFactura + datos.idProducto[i] + cont);
-                            datos2 = doc2.data();
-                            nombre.innerHTML = `${datos2.DESCRIPCION}`;
-                            cont += 1;
-                        })
-                    })
-                }
-            }
-        })
+            var cont = 0;
+
+        }
+
     })
 
 }
